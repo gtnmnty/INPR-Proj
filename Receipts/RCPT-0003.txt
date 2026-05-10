@@ -1,0 +1,19 @@
+================================================
+           ESPLENIN HOTEL RECEIPT
+================================================
+OR No.        : RCPT-0003
+Reference No  : B0003
+Guest Name    : Aegon II
+Room #        : 008
+Room Type     : Luxury Suite
+------------------------------------------------
+Room Rate     : PHP 135,000.00
+Amenities     : PHP 0.00
+------------------------------------------------
+TOTAL DUE     : PHP 135,000.00
+Amount Paid   : PHP 135,000.00
+Change        : PHP 0.00
+Method        : Card
+================================================
+       Thank you for choosing us!
+================================================

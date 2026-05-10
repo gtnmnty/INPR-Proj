@@ -19,7 +19,7 @@
 
 int choice;
 
-// ─── Structs ───────────────────────────
+// ─── Structs ────
 
 typedef struct {
   char referenceNumber[10];
@@ -59,7 +59,21 @@ typedef struct {
   char type[20]; // PerNight or PerGuest
 } Amenity;
 
-// ─── Prototypes ────────────────────────
+// ── Collect all matching bookings first ──
+typedef struct {
+  char referenceNumber[10];
+  char roomNumber[6];
+  char roomType[30];
+  char guestName[50];
+  char checkIn[20];
+  char checkOut[20];
+  int  numberOfGuests;
+  int  numberOfDays;
+  float roomRate;
+  int  isPaid;
+} FoundBooking;
+
+// ─── Prototypes ───
 
 void displayMenu();
 void chooseOption();
@@ -89,8 +103,7 @@ int main() {
 
     printf("Selection: ");
     if (scanf("%d", &choice) == 0) {
-      while (getchar() != '\n')
-        ;
+      while (getchar() != '\n');
       printf("Invalid input. Please enter a number.\n");
       continue;
     }
@@ -103,8 +116,7 @@ int main() {
       case 2:
         reserve();
         break;
-      case 3:
-        {
+      case 3: {
           char refInput[10];
           printf("Enter Reference No: ");
           scanf("%9s", refInput);
@@ -133,7 +145,7 @@ int main() {
   return 0;
 }
 
-// ─── Menu ─────────────────────────────
+// ─── Menu ─────
 void displayMenu() {
   printf("\n====== ESPLENIN HOTEL ======\n");
   printf("1. Vacancies\n");
@@ -146,7 +158,7 @@ void displayMenu() {
   printf("============================\n");
 }
 
-// ─── Option 1: List Vacant Rooms ──────
+// ─── Option 1: List Vacant Rooms ────
 void listVacant() {
   FILE *file = fopen("rooms.txt", "r");
   if (!file) {
@@ -172,7 +184,7 @@ void listVacant() {
   fclose(file);
 }
 
-// ─── Option 2: Reserve ────────────────
+// ─── Option 2: Reserve ───
 void reserve() {
     FILE *file = fopen("rooms.txt", "r");
     if (!file) { printf("Could not open rooms.txt\n"); return; }
@@ -205,7 +217,7 @@ void reserve() {
     scanf("%d", &numberOfDays);
     while (getchar() != '\n');
 
-    // ── Room type selection ─────────────
+    // ── Room type selection ──
     printf("\nRoom Type:\n");
     printf("  [A] - De Luxe\n");
     printf("  [B] - Suite\n");
@@ -218,12 +230,12 @@ void reserve() {
 
     const char *chosenCategory;
     switch (roomTypePick) {
-        case 'A': chosenCategory = "De Luxe";      break;
-        case 'B': chosenCategory = "Suite";         break;
-        case 'C': chosenCategory = "Luxury Suite";  break;
-        default:
-            printf("Invalid room type choice.\n");
-            return;
+      case 'A': chosenCategory = "De Luxe";      break;
+      case 'B': chosenCategory = "Suite";         break;
+      case 'C': chosenCategory = "Luxury Suite";  break;
+      default:
+        printf("Invalid room type choice.\n");
+        return;
     }
 
     // Filters and display available rooms in the same cat
@@ -267,13 +279,13 @@ void reserve() {
 
     } while (selectedIndex == -1);
 
-    // ── Compute totals ────
+    // ── Compute totals ──
     float roomRate = rooms[selectedIndex].pricePerNight * numberOfDays;
 
     char referenceNumber[10];
     generateReferenceNumber(referenceNumber);
 
-    // ── Reservation summary ─────
+    // ── Reservation summary ──
     printf("\nRoom Type   : %s\n", chosenCategory);
     printf("Price/night : PHP "); printWithCommas(rooms[selectedIndex].pricePerNight); printf("\n");
     printf("Room Rate   : PHP "); printWithCommas(roomRate);
@@ -281,7 +293,7 @@ void reserve() {
     printf("Your reference no: %s\n", referenceNumber);
     printf("_____________________________________________\n");
 
-    // ── Confirm proceed ──────
+    // ── Confirm proceed ──
     printf("\nDo you want to proceed? [y/n]: ");
     char confirmReservation;
     scanf("%c", &confirmReservation);
@@ -292,7 +304,7 @@ void reserve() {
         return;
     }
 
-    // ── Mark room as occupied and update rooms.txt ────────────────────────────
+    // ── Mark room as occupied and update rooms.txt ───
     rooms[selectedIndex].isAvailable = 0;
     file = fopen("rooms.txt", "w");
     if (!file) { printf("Could not update rooms.txt\n"); return; }
@@ -306,7 +318,7 @@ void reserve() {
     }
     fclose(file);
 
-    // ── Append to bookings.txt ─────────
+    // ── Append to bookings.txt ───
     file = fopen("bookings.txt", "a");
     if (!file) { printf("Could not open bookings.txt\n"); return; }
     fprintf(file, "\n");
@@ -335,7 +347,7 @@ void reserve() {
     fprintf(file, "===========================================================\n");
     fclose(file);
 
-    // ── Display booking confirmation ───────
+    // ── Display booking confirmation ──
     printf("\nBooking\n");
     printf("Input reference no. %s\n", referenceNumber);
     printf("Details:\n");
@@ -360,7 +372,7 @@ void reserve() {
         printf("Thank you for reserving. Enjoy your room.\n");
 }
 
-// ─── Option 3: Payment ────────────────
+// ── Option 3: Payment ──
 void payment(const char *referenceNumber, int fromReserve) {
   Reservation reservation;
 
@@ -374,7 +386,7 @@ void payment(const char *referenceNumber, int fromReserve) {
       return;
   }
 
-  // ── Payment summary ───────────────────────────────────────────────────────
+  // ── Payment summary ──
   printf("\n------- Payment -------\n");
   printf("Input Reference No.  :  %s\n", reservation.referenceNumber);
   printf("Check-In             :  %s\n", reservation.checkIn);
@@ -386,86 +398,86 @@ void payment(const char *referenceNumber, int fromReserve) {
   printf("Price/night          :  PHP "); printWithCommas(reservation.pricePerNight); printf("\n");
   printf("Room Rate            :  PHP "); printWithCommas(reservation.roomRate);      printf("\n");
 
-  // ── Amenities (only from reserve) ─────────────────────────────────────────
+  // ── Amenities (only from reserve) ──
   if (fromReserve) {
       Amenity selectedAmenities[MAX_AMENITIES];
-      int     selectedCount = 0;
-      char    addMore       = 'y';
+      int selectedCount = 0;
+      char addMore = 'y';
 
       printf("\nWould you like to add Amenities? [y/n]: ");
       scanf("%c", &addMore);
       while (getchar() != '\n');
 
       while (tolower(addMore) == 'y') {
-          printf("\n----- AMENITIES -----\n");
-          printf("  [A] - Convenience\n");
-          printf("  [B] - Pool\n");
-          printf("  [C] - Spa\n");
-          printf("  [N] - No Amenities\n");
-          printf("Choice: ");
-          char categoryPick;
-          scanf("%c", &categoryPick);
-          while (getchar() != '\n');
-          categoryPick = toupper(categoryPick);
+        printf("\n----- AMENITIES -----\n");
+        printf("  [A] - Convenience\n");
+        printf("  [B] - Pool\n");
+        printf("  [C] - Spa\n");
+        printf("  [N] - No Amenities\n");
+        printf("Choice: ");
+        char categoryPick;
+        scanf("%c", &categoryPick);
+        while (getchar() != '\n');
+        categoryPick = toupper(categoryPick);
 
-          if (categoryPick == 'N') break;
+        if (categoryPick == 'N') break;
 
-          char filepath[60];
-          switch (categoryPick) {
-              case 'A': strcpy(filepath, "Amenities/convenienceAmenite.txt"); break;
-              case 'B': strcpy(filepath, "Amenities/poolAmenite.txt");        break;
-              case 'C': strcpy(filepath, "Amenities/spaAmenite.txt");         break;
-              default:  printf("Invalid choice.\n"); continue;
+        char filepath[60];
+        switch (categoryPick) {
+          case 'A': strcpy(filepath, "Amenities/convenienceAmenite.txt"); break;
+          case 'B': strcpy(filepath, "Amenities/poolAmenite.txt");        break;
+          case 'C': strcpy(filepath, "Amenities/spaAmenite.txt");         break;
+          default:  printf("Invalid choice.\n"); continue;
+        }
+
+        Amenity availableAmenities[10];
+        int     availableCount = readAmenities(filepath, availableAmenities, 10);
+
+        if (availableCount == 0) { printf("No amenities found in file.\n"); continue; }
+
+        char priceBuffer[20];
+        printf("\n%-6s | %-40s | %-16s | %s\n", "Code", "Name", "Price", "Type");
+        printf("-------------------------------------------------------------------------------------------\n");
+        for (int i = 0; i < availableCount; i++) {
+          printf("%-6s | %-40s | PHP %-12s | %-10s\n",
+            availableAmenities[i].code,
+            availableAmenities[i].name,
+            formatPrice(availableAmenities[i].price, priceBuffer),
+            availableAmenities[i].type);
+        }
+
+        printf("\nEnter code to add (or 0 to skip): ");
+        char codePick[5];
+        scanf("%4s", codePick);
+        while (getchar() != '\n');
+
+        if (strcmp(codePick, "0") == 0) goto askMore;
+
+        int foundIndex = -1;
+        for (int i = 0; i < availableCount; i++) {
+          if (strcasecmp(availableAmenities[i].code, codePick) == 0) {
+            foundIndex = i;
+            break;
           }
+        }
+        if (foundIndex == -1) { printf("Code not found.\n"); goto askMore; }
 
-          Amenity availableAmenities[10];
-          int     availableCount = readAmenities(filepath, availableAmenities, 10);
+        float amenityCost = (strcmp(availableAmenities[foundIndex].type, "PerNight") == 0)
+            ? availableAmenities[foundIndex].price * reservation.numberOfDays
+            : availableAmenities[foundIndex].price * reservation.numberOfGuests;
 
-          if (availableCount == 0) { printf("No amenities found in file.\n"); continue; }
+        reservation.amenitiesTotal += amenityCost;
+        if (selectedCount < MAX_AMENITIES)
+            selectedAmenities[selectedCount++] = availableAmenities[foundIndex];
 
-          char priceBuffer[20];
-          printf("\n%-6s | %-40s | %-16s | %s\n", "Code", "Name", "Price", "Type");
-          printf("-------------------------------------------------------------------------------------------\n");
-          for (int i = 0; i < availableCount; i++) {
-              printf("%-6s | %-40s | PHP %-12s | %-10s\n",
-                      availableAmenities[i].code,
-                      availableAmenities[i].name,
-                      formatPrice(availableAmenities[i].price, priceBuffer),
-                      availableAmenities[i].type);
-          }
+        printf("Added: %s -- PHP ", availableAmenities[foundIndex].name);
+        printWithCommas(amenityCost);
+        printf("\n");
 
-          printf("\nEnter code to add (or 0 to skip): ");
-          char codePick[5];
-          scanf("%4s", codePick);
-          while (getchar() != '\n');
-
-          if (strcmp(codePick, "0") == 0) goto askMore;
-
-          int foundIndex = -1;
-          for (int i = 0; i < availableCount; i++) {
-              if (strcasecmp(availableAmenities[i].code, codePick) == 0) {
-                  foundIndex = i;
-                  break;
-              }
-          }
-          if (foundIndex == -1) { printf("Code not found.\n"); goto askMore; }
-
-          float amenityCost = (strcmp(availableAmenities[foundIndex].type, "PerNight") == 0)
-              ? availableAmenities[foundIndex].price * reservation.numberOfDays
-              : availableAmenities[foundIndex].price * reservation.numberOfGuests;
-
-          reservation.amenitiesTotal += amenityCost;
-          if (selectedCount < MAX_AMENITIES)
-              selectedAmenities[selectedCount++] = availableAmenities[foundIndex];
-
-          printf("Added: %s — PHP ", availableAmenities[foundIndex].name);
-          printWithCommas(amenityCost);
-          printf("\n");
-
-          askMore:
-          printf("Add another amenity? [y/n]: ");
-          scanf("%c", &addMore);
-          while (getchar() != '\n');
+        askMore:
+        printf("Add another amenity? [y/n]: ");
+        scanf("%c", &addMore);
+        while (getchar() != '\n');
       }
 
       // Write amenity codes to bookings.txt
@@ -476,36 +488,36 @@ void payment(const char *referenceNumber, int fromReserve) {
               int  totalLines = 0;
               while (totalLines < MAX_BOOKINGS &&
                       fgets(lines[totalLines], sizeof(lines[totalLines]), file)) {
-                  lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
-                  totalLines++;
+                lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
+                totalLines++;
               }
               fclose(file);
 
               int inTargetBlock = 0;
               for (int i = 0; i < totalLines; i++) {
-                  if (strncmp(lines[i], "Reference No:", 13) == 0) {
-                      char tmp[10];
-                      sscanf(lines[i], "Reference No: %9s", tmp);
-                      inTargetBlock = (strcmp(tmp, reservation.referenceNumber) == 0);
+                if (strncmp(lines[i], "Reference No:", 13) == 0) {
+                  char tmp[10];
+                  sscanf(lines[i], "Reference No: %9s", tmp);
+                  inTargetBlock = (strcmp(tmp, reservation.referenceNumber) == 0);
+                }
+                if (inTargetBlock && strncmp(lines[i], "Amenities Used:", 15) == 0) {
+                  char amenityLine[200] = "Amenities Used:";
+                  for (int j = 0; j < selectedCount; j++) {
+                    strcat(amenityLine, " ");
+                    strcat(amenityLine, selectedAmenities[j].code);
+                    if (j < selectedCount - 1) strcat(amenityLine, ",");
                   }
-                  if (inTargetBlock && strncmp(lines[i], "Amenities Used:", 15) == 0) {
-                      char amenityLine[200] = "Amenities Used:";
-                      for (int j = 0; j < selectedCount; j++) {
-                          strcat(amenityLine, " ");
-                          strcat(amenityLine, selectedAmenities[j].code);
-                          if (j < selectedCount - 1) strcat(amenityLine, ",");
-                      }
-                      strcpy(lines[i], amenityLine);
-                  }
-                  if (strncmp(lines[i], "===========", 11) == 0)
-                      inTargetBlock = 0;
+                  strcpy(lines[i], amenityLine);
+                }
+                if (strncmp(lines[i], "===========", 11) == 0)
+                  inTargetBlock = 0;
               }
 
               file = fopen("bookings.txt", "w");
               if (file) {
-                  for (int i = 0; i < totalLines; i++)
-                      fprintf(file, "%s\n", lines[i]);
-                  fclose(file);
+                for (int i = 0; i < totalLines; i++)
+                  fprintf(file, "%s\n", lines[i]);
+                fclose(file);
               }
           }
       }
@@ -513,7 +525,7 @@ void payment(const char *referenceNumber, int fromReserve) {
 
   reservation.finalAmount = reservation.roomRate + reservation.amenitiesTotal;
 
-  // ── Bill breakdown ────────────────────────────────────────────────────────
+  // ── Bill breakdown ──
   printf("\n========================================\n");
   printf("           BILL BREAKDOWN\n");
   printf("========================================\n");
@@ -528,7 +540,7 @@ void payment(const char *referenceNumber, int fromReserve) {
   printf("FINAL AMOUNT  : PHP "); printWithCommas(reservation.finalAmount);    printf("\n");
   printf("========================================\n");
 
-  // ── Payment method — re-ask on invalid ─────
+  // ── Payment method — re-ask on invalid ──
   int methodPick = 0;
     do {
       printf("\nPayment Method:\n");
@@ -611,7 +623,7 @@ void payment(const char *referenceNumber, int fromReserve) {
       printf("Processing card payment...\n");
 
   } else {
-      // ── GCash ────────────────────────────────────────────────────────────
+      // ── GCash ──
       strcpy(reservation.paymentMethod, "GCash");
 
       char gcashNumber[15];
@@ -676,7 +688,7 @@ void payment(const char *referenceNumber, int fromReserve) {
       printf("Change          : PHP "); printWithCommas(reservation.change);         printf("\n");
   }
   printf("========================================\n");
-  printf("Thank you, %s! Have a nice day.\n", reservation.guestName);
+  printf("Thank you, %s! Enjoy your room! :).\n", reservation.guestName);
 
   updateBookingPayment(&reservation);
   receiptGenerator(&reservation, methodPick);
@@ -689,120 +701,105 @@ void registry() {
 
     printf("\n--- REGISTRY ---\n");
     do {
-        printf("Enter full name to search: ");
-        fgets(searchName, sizeof(searchName), stdin);
-        searchName[strcspn(searchName, "\n")] = '\0';
+      printf("Enter full name to search: ");
+      fgets(searchName, sizeof(searchName), stdin);
+      searchName[strcspn(searchName, "\n")] = '\0';
 
-        FILE *file = fopen("bookings.txt", "r");
-        if (!file) { printf("Could not open bookings.txt\n"); return; }
+      FILE *file = fopen("bookings.txt", "r");
+      if (!file) { printf("Could not open bookings.txt\n"); return; }
 
-        // ── Collect all matching bookings first ────────
-        typedef struct {
-            char referenceNumber[10];
-            char roomNumber[6];
-            char roomType[30];
-            char guestName[50];
-            char checkIn[20];
-            char checkOut[20];
-            int  numberOfGuests;
-            int  numberOfDays;
-            float roomRate;
-            int  isPaid;
-        } FoundBooking;
+      FoundBooking results[MAX_BOOKINGS];
+      int          resultCount = 0;
 
-        FoundBooking results[MAX_BOOKINGS];
-        int          resultCount = 0;
+      char line[200];
+      int  insideBlock = 0;
 
-        char line[200];
-        int  insideBlock = 0;
+      // Temp vars for current block
+      char  tempRef[10]   = "";
+      char  tempRoom[6]   = "";
+      char  tempType[30]  = "";
+      char  tempName[50]  = "";
+      char  tempIn[20]    = "";
+      char  tempOut[20]   = "";
+      int   tempGuests    = 0;
+      int   tempDays      = 0;
+      float tempRate      = 0;
+      int   tempPaid      = 0;
 
-        // Temp vars for current block
-        char  tempRef[10]   = "";
-        char  tempRoom[6]   = "";
-        char  tempType[30]  = "";
-        char  tempName[50]  = "";
-        char  tempIn[20]    = "";
-        char  tempOut[20]   = "";
-        int   tempGuests    = 0;
-        int   tempDays      = 0;
-        float tempRate      = 0;
-        int   tempPaid      = 0;
+      while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = '\0';
 
-        while (fgets(line, sizeof(line), file)) {
-          line[strcspn(line, "\n")] = '\0';
+        if (strncmp(line, "------- Guest Info", 18) == 0) {
+          insideBlock = 1;
+          // reset temp vars
+          tempRef[0] = tempRoom[0] = tempType[0] = '\0';
+          tempName[0] = tempIn[0] = tempOut[0] = '\0';
+          tempGuests = tempDays = tempPaid = 0;
+          tempRate = 0;
+        }
 
-          if (strncmp(line, "------- Guest Info", 18) == 0) {
-            insideBlock = 1;
-            // reset temp vars
-            tempRef[0] = tempRoom[0] = tempType[0] = '\0';
-            tempName[0] = tempIn[0] = tempOut[0] = '\0';
-            tempGuests = tempDays = tempPaid = 0;
-            tempRate = 0;
-          }
+        if (!insideBlock) continue;
 
-          if (!insideBlock) continue;
+        if      (strncmp(line, "Reference No:", 13) == 0)
+            sscanf(line, "Reference No: %9s",    tempRef);
+        else if (strncmp(line, "Room #:", 7) == 0)
+            sscanf(line, "Room #: %5s",           tempRoom);
+        else if (strncmp(line, "Room Type:", 10) == 0)
+            sscanf(line, "Room Type: %29[^\n]",   tempType);
+        else if (strncmp(line, "Main Guest:", 11) == 0)
+            sscanf(line, "Main Guest: %49[^\n]",  tempName);
+        else if (strncmp(line, "Check-In:", 9) == 0)
+            sscanf(line, "Check-In: %19[^\n]",    tempIn);
+        else if (strncmp(line, "Checkout:", 9) == 0)
+            sscanf(line, "Checkout: %19[^\n]",    tempOut);
+        else if (strncmp(line, "No of Guest:", 12) == 0)
+            sscanf(line, "No of Guest: %d",       &tempGuests);
+        else if (strncmp(line, "No of Days:", 11) == 0)
+            sscanf(line, "No of Days: %d",        &tempDays);
+        else if (strncmp(line, "Room Rate:", 10) == 0)
+            sscanf(line, "Room Rate: %f",          &tempRate);
+        else if (strncmp(line, "Status:", 7) == 0)
+            tempPaid = (strstr(line, "Not Paid") == NULL && strstr(line, "Paid") != NULL);
 
-          if      (strncmp(line, "Reference No:", 13) == 0)
-              sscanf(line, "Reference No: %9s",    tempRef);
-          else if (strncmp(line, "Room #:", 7) == 0)
-              sscanf(line, "Room #: %5s",           tempRoom);
-          else if (strncmp(line, "Room Type:", 10) == 0)
-              sscanf(line, "Room Type: %29[^\n]",   tempType);
-          else if (strncmp(line, "Main Guest:", 11) == 0)
-              sscanf(line, "Main Guest: %49[^\n]",  tempName);
-          else if (strncmp(line, "Check-In:", 9) == 0)
-              sscanf(line, "Check-In: %19[^\n]",    tempIn);
-          else if (strncmp(line, "Checkout:", 9) == 0)
-              sscanf(line, "Checkout: %19[^\n]",    tempOut);
-          else if (strncmp(line, "No of Guest:", 12) == 0)
-              sscanf(line, "No of Guest: %d",       &tempGuests);
-          else if (strncmp(line, "No of Days:", 11) == 0)
-              sscanf(line, "No of Days: %d",        &tempDays);
-          else if (strncmp(line, "Room Rate:", 10) == 0)
-              sscanf(line, "Room Rate: %f",          &tempRate);
-          else if (strncmp(line, "Status:", 7) == 0)
-              tempPaid = (strstr(line, "Not Paid") == NULL && strstr(line, "Paid") != NULL);
-
-          if (strncmp(line, "===========", 11) == 0 && insideBlock) {
-              insideBlock = 0;
-
-            // Check if name matches (case-insensitive, full name)
-            if (strcasecmp(tempName, searchName) == 0 && resultCount < MAX_BOOKINGS) {
-              strcpy(results[resultCount].referenceNumber, tempRef);
-              strcpy(results[resultCount].roomNumber,      tempRoom);
-              strcpy(results[resultCount].roomType,        tempType);
-              strcpy(results[resultCount].guestName,       tempName);
-              strcpy(results[resultCount].checkIn,         tempIn);
-              strcpy(results[resultCount].checkOut,        tempOut);
-
-              resultCount++;
-            }
+        if (strncmp(line, "===========", 11) == 0 && insideBlock) {
             insideBlock = 0;
+
+          // Check if name matches (case-insensitive, full name)
+          if (strcasecmp(tempName, searchName) == 0 && resultCount < MAX_BOOKINGS) {
+            strcpy(results[resultCount].referenceNumber, tempRef);
+            strcpy(results[resultCount].roomNumber,      tempRoom);
+            strcpy(results[resultCount].roomType,        tempType);
+            strcpy(results[resultCount].guestName,       tempName);
+            strcpy(results[resultCount].checkIn,         tempIn);
+            strcpy(results[resultCount].checkOut,        tempOut);
+
+            resultCount++;
           }
+          insideBlock = 0;
         }
+      }
 
-        fclose(file);
+      fclose(file);
 
-        // ── Display results ───────────────────────────────────────────────────
-        if (resultCount == 0) {
-            printf("No bookings found for \"%s\".\n", searchName);
-        } else {
-          printf("\n------- BOOKING FOUND -------\n");
-          for (int i = 0; i < resultCount; i++) {
-            printf("Reference No    : %s\n",  results[i].referenceNumber);
-            printf("Room #          : %s\n",  results[i].roomNumber);
-            printf("Room Type       : %s\n",  results[i].roomType);
-            printf("Main Guest      : %s\n",  results[i].guestName);
-            if (i < resultCount - 1)
-              printf("-----------------------------\n");
-          }
-          printf("-----------------------------\n");
+      // ── Display results ───────────────────────────────────────────────────
+      if (resultCount == 0) {
+          printf("No bookings found for \"%s\".\n", searchName);
+      } else {
+        printf("\n------- BOOKING FOUND -------\n");
+        for (int i = 0; i < resultCount; i++) {
+          printf("Reference No    : %s\n",  results[i].referenceNumber);
+          printf("Room #          : %s\n",  results[i].roomNumber);
+          printf("Room Type       : %s\n",  results[i].roomType);
+          printf("Main Guest      : %s\n",  results[i].guestName);
+          if (i < resultCount - 1)
+            printf("-----------------------------\n");
         }
+        printf("-----------------------------\n");
+      }
 
-        printf("\nSearch another guest? [y/n]: ");
-        scanf("%c", &searchAgain);
-        while (getchar() != '\n');
-
+      printf("\nSearch another guest? [y/n]: ");
+      scanf("%c", &searchAgain);
+      while (getchar() != '\n');
     } while (tolower(searchAgain) == 'y');
 
     printf("Returning to main menu.\n");

@@ -22,4 +22,50 @@ Change:
 
 ===========================================================
 
+------- Guest Info -------
+Reference No: B0002
+Room #: 001
+Room Type: Luxury Suite
+Main Guest: Aegon II
+No of Guest: 2
+Check-In: March 31, 2029
+Checkout: April 21, 2030
+No of Days: 21
 
+------- Bill Info -------
+Room Rate: 420000.00
+Amenities Used: S1
+Amenities Total: 3000.00
+Final Amount: 423000.00
+
+------- Payment Info -------
+Status: Paid
+Method: Card
+Amount Received: 423000.00
+Change: 0.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0003
+Room #: 008
+Room Type: Luxury Suite
+Main Guest: Aegon II
+No of Guest: 2
+Check-In: April 21, 2029
+Checkout: April 30, 2029
+No of Days: 9
+
+------- Bill Info -------
+Room Rate: 135000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 135000.00
+
+------- Payment Info -------
+Status: Paid
+Method: Card
+Amount Received: 135000.00
+Change: 0.00
+
+===========================================================

@@ -2,7 +2,7 @@ Room #001:
 Category: Luxury Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Vacant
+Status: Occupied
 
 Room #002:
 Category: Luxury Suite
@@ -25,13 +25,13 @@ Status: Vacant
 Room #005:
 Category: Suite
 Bedrooms: 4
-Price: 15.00
+Price: 15000
 Status: Vacant
 
 Room #006:
 Category: Luxury Suite
 Bedrooms: 4
-Price: 15.00
+Price: 15000
 Status: Vacant
 
 Room #007:
@@ -44,5 +44,5 @@ Room #008:
 Category: Luxury Suite
 Bedrooms: 0
 Price: 15000.00
-Status: Vacant
+Status: Occupied
 
