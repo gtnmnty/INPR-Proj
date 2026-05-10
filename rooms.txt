@@ -8,7 +8,7 @@ Room #002:
 Category: Luxury Suite
 Bedrooms: 2
 Price: 12000.00
-Status: Occupied
+Status: Vacant
 
 Room #003:
 Category: Luxury Suite

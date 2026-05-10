@@ -8,9 +8,18 @@
 #define MAX_BOOKINGS 500
 #define MAX_AMENITIES 20
 
+#ifdef _WIN32
+    #include <windows.h>
+    #define DELAY(ms) Sleep(ms)
+#else
+    #include <unistd.h>
+    #define DELAY(ms) sleep((ms) / 1000)
+#endif
+
+
 int choice;
 
-// ─── Structs ───────────────────────────────────────────────────────────────────
+// ─── Structs ───────────────────────────
 
 typedef struct {
   char referenceNumber[10];
@@ -50,7 +59,7 @@ typedef struct {
   char type[20]; // PerNight or PerGuest
 } Amenity;
 
-// ─── Forward Declarations ─────────────────────────────────────────────────────
+// ─── Prototypes ────────────────────────
 
 void displayMenu();
 void chooseOption();
@@ -59,6 +68,7 @@ void reserve();
 void payment(const char *referenceNumber, int fromReserve);
 void registry();
 void viewDetails();
+void checkout();
 
 void generateReferenceNumber(char *output);
 int readRoom(FILE *fp, Room *room);
@@ -69,7 +79,7 @@ void printWithCommas(float amount);
 char *formatPrice(float amount, char *buffer);
 void receiptGenerator(Reservation *reservation, int methodPick);
 
-// ─── Main ──────────────────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────
 
 int main() {
   system("mkdir Receipts 2>nul");
@@ -110,7 +120,7 @@ int main() {
         viewDetails();
         break;
       case 6:
-        printf("Checkout: coming soon.\n");
+        checkout();
         break;
       case 7:
         printf("Exiting ESPLENIN HOTEL system...\n");
@@ -123,8 +133,7 @@ int main() {
   return 0;
 }
 
-// ─── Menu ──────────────────────────────────────────────────────────────────────
-
+// ─── Menu ─────────────────────────────
 void displayMenu() {
   printf("\n====== ESPLENIN HOTEL ======\n");
   printf("1. Vacancies\n");
@@ -138,7 +147,6 @@ void displayMenu() {
 }
 
 // ─── Option 1: List Vacant Rooms ──────
-
 void listVacant() {
   FILE *file = fopen("rooms.txt", "r");
   if (!file) {
@@ -164,8 +172,7 @@ void listVacant() {
   fclose(file);
 }
 
-// ─── Option 2: Reserve ────────────────────
-
+// ─── Option 2: Reserve ────────────────
 void reserve() {
     FILE *file = fopen("rooms.txt", "r");
     if (!file) { printf("Could not open rooms.txt\n"); return; }
@@ -353,8 +360,7 @@ void reserve() {
         printf("Thank you for reserving. Enjoy your room.\n");
 }
 
-// ─── Option 3: Payment ────────────────────────────────────────────────────────
-
+// ─── Option 3: Payment ────────────────
 void payment(const char *referenceNumber, int fromReserve) {
   Reservation reservation;
 
@@ -676,8 +682,7 @@ void payment(const char *referenceNumber, int fromReserve) {
   receiptGenerator(&reservation, methodPick);
 }
 
-// ─── Option 4: Registry ───────────────────────────────────────────────────────
-
+// ─── Option 4: Registry ───────────────
 void registry() {
     char searchName[50];
     char searchAgain;
@@ -803,8 +808,7 @@ void registry() {
     printf("Returning to main menu.\n");
 }
 
-// ─── Option 5: View Room Details ──────────────────────────────────────────────
-
+// ─── Option 5: View Room Details ──────
 void viewDetails() {
   FILE *file = fopen("rooms.txt", "r");
   if (!file) {
@@ -855,10 +859,147 @@ void viewDetails() {
   printf("Status   : %s\n", selected.isAvailable ? "Vacant" : "Occupied");
 }
 
+// ─── Option 6: Checkout ───────────────
+void checkout() {
+  printf("\n========================================\n");
+  printf("           ESPLENIN - CHECKOUT\n");
+  printf("========================================\n");
+
+  char referenceInput[10];
+
+  while (1) {
+    printf("\nEnter Reference Number (0 to cancel): ");
+    scanf("%9s", referenceInput);
+    while (getchar() != '\n');
+
+    if (strcmp(referenceInput, "0") == 0) {
+      printf("Returning to main menu.\n");
+      return;
+    }
+
+    // ── Try to find booking ───────────────────────────────────────────────
+    Reservation reservation;
+    if (!findBooking(referenceInput, &reservation)) {
+      printf("Invalid reference number. Please try again.\n");
+      continue;
+    }
+
+    // ── Display guest details ─────────────────────────────────────────────
+    printf("\n--- GUEST DETAILS ---\n");
+    printf("Guest Name : %s\n",   reservation.guestName);
+    printf("Room No.   : %03d (%s)\n", reservation.roomNumber, reservation.roomType);
+    printf("Total Paid : PHP ");  printWithCommas(reservation.finalAmount); printf("\n");
+    printf("Status     : %s\n",   reservation.isPaid ? "PAID" : "NOT PAID");
+
+    if (!reservation.isPaid) {
+      printf("\nWarning: This booking has not been paid yet.\n");
+      printf("Please settle payment before checking out.\n");
+      return;
+    }
+
+    // ── Confirm checkout ──────────────────────────────────────────────────
+    printf("\nAre you sure you want to check out this guest? [y/n]: ");
+    char confirm;
+    scanf("%c", &confirm);
+    while (getchar() != '\n');
+
+    if (tolower(confirm) != 'y') {
+      printf("Checkout cancelled. Returning to main menu.\n");
+      return;
+    }
+
+    // ── Update room status to Vacant in rooms.txt ─────────────────────────
+    printf("\nUpdating room status...\n");
+    DELAY(1500);
+
+    FILE *roomFile = fopen("rooms.txt", "r");
+    if (!roomFile) { printf("Could not open rooms.txt\n"); return; }
+
+    Room rooms[MAX_ROOMS];
+    int  roomCount = 0;
+    while (readRoom(roomFile, &rooms[roomCount])) roomCount++;
+    fclose(roomFile);
+
+    for (int i = 0; i < roomCount; i++) {
+      if (rooms[i].roomNumber == reservation.roomNumber) {
+        rooms[i].isAvailable = 1;
+        break;
+      }
+    }
+
+    roomFile = fopen("rooms.txt", "w");
+    if (!roomFile) { printf("Could not update rooms.txt\n"); return; }
+    for (int i = 0; i < roomCount; i++) {
+      fprintf(roomFile, "Room #%03d:\n",  rooms[i].roomNumber);
+      fprintf(roomFile, "Category: %s\n", rooms[i].category);
+      fprintf(roomFile, "Bedrooms: %d\n", rooms[i].bedrooms);
+      fprintf(roomFile, "Price: %.2f\n",  rooms[i].pricePerNight);
+      fprintf(roomFile, "Status: %s\n",   rooms[i].isAvailable ? "Vacant" : "Occupied");
+      fprintf(roomFile, "\n");
+    }
+    fclose(roomFile);
+
+    // ── Remove booking from bookings.txt ──────────────────────────────────
+    printf("Archiving record...\n");
+    DELAY(1500);
+
+    FILE *bookingFile = fopen("bookings.txt", "r");
+    if (!bookingFile) { printf("Could not open bookings.txt\n"); return; }
+
+    char lines[MAX_BOOKINGS][200];
+    int  totalLines = 0;
+    while (totalLines < MAX_BOOKINGS &&
+            fgets(lines[totalLines], sizeof(lines[totalLines]), bookingFile)) {
+        lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
+        totalLines++;
+    }
+    fclose(bookingFile);
+
+    // Find the block to delete — from "------- Guest Info" to "==========="
+    int deleteStart = -1;
+    int deleteEnd   = -1;
+    int inTarget    = 0;
+
+    for (int i = 0; i < totalLines; i++) {
+        if (strncmp(lines[i], "------- Guest Info", 18) == 0)
+          inTarget = 1;
+
+        if (inTarget && strncmp(lines[i], "Reference No:", 13) == 0) {
+          char tmp[10];
+          sscanf(lines[i], "Reference No: %9s", tmp);
+          if (strcmp(tmp, reservation.referenceNumber) == 0)
+              deleteStart = i - 1; // include the blank line before the block
+        }
+
+        if (inTarget && strncmp(lines[i], "===========", 11) == 0) {
+          if (deleteStart != -1) {
+            deleteEnd = i;
+            break;
+          }
+          inTarget = 0;
+        }
+    }
+
+    // Rewrite file skipping the deleted block
+    bookingFile = fopen("bookings.txt", "w");
+    if (!bookingFile) { printf("Could not update bookings.txt\n"); return; }
+    for (int i = 0; i < totalLines; i++) {
+      if (deleteStart != -1 && i >= deleteStart && i <= deleteEnd)
+        continue;
+      fprintf(bookingFile, "%s\n", lines[i]);
+    }
+    fclose(bookingFile);
+
+    // ── Success ───────────────────────────────────────────────────────────
+    printf("\n[Checkout Successful! Room #%03d is now VACANT.]\n",
+            reservation.roomNumber);
+    printf("========================================\n");
+    return;
+  }
+}
 
 
-
-// ─── UTILS FUNCTIONS ──────────────────────────────────────────────────────────
+// ─── UTILS FUNCTIONS ──────────────────
 
 void printWithCommas(float amount) {
   int wholeNumber = (int)amount;
@@ -995,6 +1136,8 @@ int findBooking(const char *referenceNumber, Reservation *reservation) {
       sscanf(line, "Checkout: %19[^\n]", reservation->checkOut);
     else if (strncmp(line, "No of Days:", 11) == 0)
       sscanf(line, "No of Days: %d", &reservation->numberOfDays);
+    else if (strncmp(line, "Room #:", 7) == 0)
+      sscanf(line, "Room #: %d", &reservation->roomNumber);
     else if (strncmp(line, "Room Rate:", 10) == 0)
       sscanf(line, "Room Rate: %f", &reservation->roomRate);
     else if (strncmp(line, "Amenities Total:", 16) == 0)
