@@ -24,48 +24,48 @@ Change:
 
 ------- Guest Info -------
 Reference No: B0002
-Room #: 005
-Room Type: Suite
-Main Guest: Jon Snow
-No of Guest: 3
-Check-In: March 27, 2027
-Checkout: March 20, 2028
-No of Days: 2
+Room #: 002
+Room Type: Luxury Suite
+Main Guest: Duncan
+No of Guest: 2
+Check-In: mrch 12, 2029
+Checkout: march 17, 2029
+No of Days: 3
 
 ------- Bill Info -------
-Room Rate: 30.00
+Room Rate: 36000.00
 Amenities Used:
 Amenities Total: 0.00
-Final Amount: 30.00
+Final Amount: 36000.00
 
 ------- Payment Info -------
-Status: Not Paid
-Method:
-Amount Received:
-Change:
+Status: Paid
+Method: Cash
+Amount Received: 36000.00
+Change: 0.00
 
 ===========================================================
 
 ------- Guest Info -------
 Reference No: B0003
-Room #: 007
-Room Type: Suite
-Main Guest: Jon SNow
-No of Guest: 3
-Check-In: March 25, 2027
-Checkout: March 29, 2027
-No of Days: 4
+Room #: 003
+Room Type: Luxury Suite
+Main Guest: Aegon II
+No of Guest: 2
+Check-In: March 12, 2029
+Checkout: March 15, 2029
+No of Days: 3
 
 ------- Bill Info -------
-Room Rate: 60000.00
+Room Rate: 18000.00
 Amenities Used:
 Amenities Total: 0.00
-Final Amount: 60000.00
+Final Amount: 18000.00
 
 ------- Payment Info -------
-Status: Not Paid
-Method:
-Amount Received:
-Change:
+Status: Paid
+Method: GCash
+Amount Received: 18000.00
+Change: 0.00
 
 ===========================================================
