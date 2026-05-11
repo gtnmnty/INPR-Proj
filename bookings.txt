@@ -71,30 +71,6 @@ Change: 0.00
 ===========================================================
 
 ------- Guest Info -------
-Reference No: B0004
-Room #: 007
-Room Type: Suite
-Main Guest: Aegon II
-No of Guest: 2
-Check-In: march 29, 2029
-Checkout: march 31, 2029
-No of Days: 3
-
-------- Bill Info -------
-Room Rate: 60000.00
-Amenities Used:
-Amenities Total: 0.00
-Final Amount: 60000.00
-
-------- Payment Info -------
-Status: Paid
-Method: Card
-Amount Received: 60000.00
-Change: 0.00
-
-===========================================================
-
-------- Guest Info -------
 Reference No: B0005
 Room #: 011
 Room Type: Suite
@@ -139,5 +115,29 @@ Status: Paid
 Method: Cash
 Amount Received: 5555.00
 Change: 555.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0007
+Room #: 008
+Room Type: Imperial Grand
+Main Guest: Aegon III
+No of Guest: 2
+Check-In: march 12, 2029
+Checkout: march 29, 2029
+No of Days: 18
+
+------- Bill Info -------
+Room Rate: 990000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 990000.00
+
+------- Payment Info -------
+Status: Paid
+Method: Card
+Amount Received: 990000.00
+Change: 0.00
 
 ===========================================================

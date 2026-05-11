@@ -732,12 +732,12 @@ void payment(const char *referenceNumber, int fromReserve) {
   receiptGenerator(&reservation, methodPick);
 }
 
-// ─── Option 4: Registry ───────────────
+// Option 4: Registry
 void registry() {
     char searchName[50];
     char searchAgain;
 
-    printf("\n--- REGISTRY ---\n");
+    printf("\n----------- REGISTRY -----------\n");
     do {
       printf("Enter full name to search: ");
       fgets(searchName, sizeof(searchName), stdin);
@@ -747,10 +747,10 @@ void registry() {
       if (!file) { printf("Could not open bookings.txt\n"); return; }
 
       FoundBooking results[MAX_BOOKINGS];
-      int          resultCount = 0;
-
+      int resultCount = 0;
       char line[200];
       int  insideBlock = 0;
+      char cancelChoice;
 
       // Temp vars for current block
       char  tempRef[10]   = "";
@@ -767,7 +767,7 @@ void registry() {
       while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
 
-        if (strncmp(line, "------- Guest Info", 18) == 0) {
+        if (strncmp(line, "------- Guest Info -------", 18) == 0) {
           insideBlock = 1;
           // reset temp vars
           tempRef[0] = tempRoom[0] = tempType[0] = '\0';
@@ -778,7 +778,7 @@ void registry() {
 
         if (!insideBlock) continue;
 
-        if      (strncmp(line, "Reference No:", 13) == 0)
+        if (strncmp(line, "Reference No:", 13) == 0)
             sscanf(line, "Reference No: %9s",    tempRef);
         else if (strncmp(line, "Room #:", 7) == 0)
             sscanf(line, "Room #: %5s",           tempRoom);
@@ -816,10 +816,9 @@ void registry() {
           insideBlock = 0;
         }
       }
-
       fclose(file);
 
-      // ── Display results ───────────────────────────────────────────────────
+      // Display results
       if (resultCount == 0) {
           printf("No bookings found for \"%s\".\n", searchName);
       } else {
@@ -832,12 +831,122 @@ void registry() {
           if (i < resultCount - 1)
             printf("-----------------------------\n");
         }
-        printf("-----------------------------\n");
-      }
 
+        int valid = 0;
+
+        while(!valid) {
+          printf("\nWould you like to cancel a reservation? [y/n]: ");
+          scanf(" %c", &cancelChoice);
+          while (getchar() != '\n');
+
+          if (toupper(cancelChoice) == 'Y') break;
+          if (toupper(cancelChoice) == 'N') return;
+
+          printf("Invalid choice. Please enter Y or N only.\n");
+        }
+
+        if (tolower(cancelChoice) == 'y') {
+          char targetRef[10];
+          printf("Enter reference number to cancel: ");
+          scanf("%9s", targetRef);
+          while (getchar() != '\n');
+
+          Reservation res;
+          if (!findBooking(targetRef, &res)) {
+            printf("[ERROR] Reference number %s not found.\n", targetRef);
+            return;
+          }
+
+          // Show what will be cancelled
+          printf("\n--- CANCELLING RESERVATION ---\n");
+          printf("Reference No : %s\n", res.referenceNumber);
+          printf("Guest        : %s\n", res.guestName);
+          printf("Room Type    : %s\n", res.roomType);
+          printf("Check-In     : %s\n", res.checkIn);
+          printf("Check-Out    : %s\n", res.checkOut);
+
+          printf("\nAre you sure? [y/n]: ");
+          char confirm;
+          scanf("%c", &confirm);
+          while (getchar() != '\n');
+
+          if (tolower(confirm) != 'y') {
+            printf("Cancellation aborted.\n");
+            return;
+          }
+
+          // Reuse checkout's delete logic — reads all lines, skips the block
+          FILE *file = fopen("bookings.txt", "r");
+          if (!file) { printf("Could not open bookings.txt\n"); return; }
+
+          char lines[MAX_BOOKINGS][200];
+          int  totalLines = 0;
+          while (totalLines < MAX_BOOKINGS &&
+                fgets(lines[totalLines], sizeof(lines[totalLines]), file)) {
+            lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
+            totalLines++;
+          }
+          fclose(file);
+
+          int deleteStart = -1, deleteEnd = -1, inTarget = 0;
+          for (int i = 0; i < totalLines; i++) {
+            if (strncmp(lines[i], "------- Guest Info", 18) == 0)
+              inTarget = 1;
+            if (inTarget && strncmp(lines[i], "Reference No:", 13) == 0) {
+              char tmp[10];
+              sscanf(lines[i], "Reference No: %9s", tmp);
+              if (strcmp(tmp, targetRef) == 0)
+                deleteStart = i - 1;
+            }
+            if (inTarget && strncmp(lines[i], "===========", 11) == 0) {
+              if (deleteStart != -1) { deleteEnd = i; break; }
+              inTarget = 0;
+            }
+          }
+
+          file = fopen("bookings.txt", "w");
+          if (!file) { printf("Could not update bookings.txt\n"); return; }
+          for (int i = 0; i < totalLines; i++) {
+            if (deleteStart != -1 && i >= deleteStart && i <= deleteEnd)
+              continue;
+            fprintf(file, "%s\n", lines[i]);
+          }
+          fclose(file);
+
+          // Free up the room back to Vacant
+          FILE *roomFile = fopen("rooms.txt", "r");
+          Room rooms[MAX_ROOMS];
+          int  roomCount = 0;
+          while (readRoom(roomFile, &rooms[roomCount])) roomCount++;
+          fclose(roomFile);
+
+          for (int i = 0; i < roomCount; i++) {
+            if (rooms[i].roomNumber == res.roomNumber) {
+              rooms[i].isAvailable = 1;
+              break;
+            }
+          }
+
+          roomFile = fopen("rooms.txt", "w");
+          for (int i = 0; i < roomCount; i++) {
+            fprintf(roomFile, "Room #%03d:\n",  rooms[i].roomNumber);
+            fprintf(roomFile, "Category: %s\n", rooms[i].category);
+            fprintf(roomFile, "Bedrooms: %d\n", rooms[i].bedrooms);
+            fprintf(roomFile, "Price: %.2f\n",  rooms[i].pricePerNight);
+            fprintf(roomFile, "Status: %s\n",   rooms[i].isAvailable ? "Vacant" : "Occupied");
+            fprintf(roomFile, "\n");
+          }
+          fclose(roomFile);
+
+          printf("[SUCCESS] Reservation %s has been cancelled.\n", targetRef);
+          printf("------------------------------------------\n");
+        }
+      }
+      
       printf("\nSearch another guest? [y/n]: ");
       scanf("%c", &searchAgain);
       while (getchar() != '\n');
+
     } while (tolower(searchAgain) == 'y');
 
     printf("Returning to main menu.\n");
@@ -859,39 +968,79 @@ void viewDetails() {
 
   printf("\n--- ALL ROOMS ---\n");
   for (int i = 0; i < roomCount; i++) {
-    printf("Room #%03d | %-20s | %s\n",
-           rooms[i].roomNumber, rooms[i].category,
-           rooms[i].isAvailable ? "Vacant" : "Occupied");
+    printf("Room #%03d | %-20s\n", rooms[i].roomNumber, rooms[i].category);
   }
 
   int roomPick;
-  printf("\nEnter room number to view: ");
-  scanf("%d", &roomPick);
-  while (getchar() != '\n')
-    ;
+  char inputBuf[32];
+  int validInput;
 
-  int selectedIndex = -1;
-  for (int i = 0; i < roomCount; i++) {
-    if (rooms[i].roomNumber == roomPick) {
-      selectedIndex = i;
-      break;
+  do {
+    do {
+      printf("\nEnter room number to view: ");
+      fgets(inputBuf, sizeof(inputBuf), stdin);
+      inputBuf[strcspn(inputBuf, "\r\n")] = '\0';
+
+      // Check if every character is a digit
+      validInput = 1;
+      for (int i = 0; inputBuf[i]; i++) {
+        if (!isdigit((unsigned char)inputBuf[i])) {
+          validInput = 0;
+          break;
+        }
+      }
+
+      if (!validInput || strlen(inputBuf) == 0) {
+        printf("Invalid input. Numbers only.\n");
+        continue;
+      }
+
+      roomPick = atoi(inputBuf);
+
+      if (roomPick <= 0) {
+        printf("Invalid input. Enter a positive room number.\n");
+        validInput = 0;
+        continue;
+      }
+    } while (!validInput);
+
+    // Search for the room
+    int selectedIndex = -1;
+    for (int i = 0; i < roomCount; i++) {
+      if (rooms[i].roomNumber == roomPick) {
+        selectedIndex = i;
+        break;
+      }
     }
-  }
 
-  if (selectedIndex == -1) {
-    printf("Room #%03d not found.\n", roomPick);
-    return;
-  }
+    if (selectedIndex == -1) {
+      printf("Room #%03d not found.\n", roomPick);
+    } else {
+      Room selected = rooms[selectedIndex];
+      printf("\n--- ROOM DETAILS ---\n");
+      printf("Room     : #%03d\n",   selected.roomNumber);
+      printf("Category : %s\n",      selected.category);
+      printf("Bedrooms : %d\n",      selected.bedrooms);
+      printf("Price    : PHP ");
+      printWithCommas(selected.pricePerNight);
+      printf("/night\n");
+      printf("Status   : %s\n",      selected.isAvailable ? "Vacant" : "Occupied");
+    }
 
-  Room selected = rooms[selectedIndex];
-  printf("\n--- ROOM DETAILS ---\n");
-  printf("Room     : #%03d\n", selected.roomNumber);
-  printf("Category : %s\n", selected.category);
-  printf("Bedrooms : %d\n", selected.bedrooms);
-  printf("Price    : PHP ");
-  printWithCommas(selected.pricePerNight);
-  printf("/night\n");
-  printf("Status   : %s\n", selected.isAvailable ? "Vacant" : "Occupied");
+    // Ask if they want to view another
+    char again;
+    do {
+      printf("\nView another room? [y/n]: ");
+      scanf(" %c", &again);
+      while (getchar() != '\n');
+
+      if (toupper(again) == 'N') return;
+      if (toupper(again) == 'Y') break;
+
+      printf("Invalid choice. Enter Y or N only.\n");
+    } while (1);
+
+  } while (1);
 }
 
 // Option 6: Inquiry
@@ -1199,14 +1348,14 @@ void checkout() {
       return;
     }
 
-    // ── Try to find booking ───────────────────────────────────────────────
+    // Try to find booking
     Reservation reservation;
     if (!findBooking(referenceInput, &reservation)) {
       printf("Invalid reference number. Please try again.\n");
       continue;
     }
 
-    // ── Display guest details ─────────────────────────────────────────────
+    // Display guest details
     printf("\n--- GUEST DETAILS ---\n");
     printf("Guest Name : %s\n",   reservation.guestName);
     printf("Room No.   : %03d (%s)\n", reservation.roomNumber, reservation.roomType);

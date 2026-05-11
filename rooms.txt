@@ -38,13 +38,13 @@ Room #007:
 Category: Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Occupied
+Status: Vacant
 
 Room #008:
 Category: Imperial Grand
 Bedrooms: 5
 Price: 55000.00
-Status: Vacant
+Status: Occupied
 
 Room #009:
 Category: Classic
