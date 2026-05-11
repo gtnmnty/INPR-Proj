@@ -1,48 +1,120 @@
 Room #001:
-Category: Luxury Suite
+Category: Classic
+Bedrooms: 2
+Price: 6500.00
+Status: Occupied
+
+Room #002:
+Category: De Luxe
+Bedrooms: 3
+Price: 12500.00
+Status: Vacant
+
+Room #003:
+Category: Suite
 Bedrooms: 3
 Price: 20000.00
 Status: Occupied
 
-Room #002:
-Category: Luxury Suite
-Bedrooms: 2
-Price: 12000.00
-Status: Vacant
-
-Room #003:
-Category: Luxury Suite
-Bedrooms: 1
-Price: 6000.00
+Room #004:
+Category: Imperial Grand
+Bedrooms: 4
+Price: 45000.00
 Status: Occupied
 
-Room #004:
-Category: De Luxe
-Bedrooms: 4
-Price: 35000.00
-Status: Vacant
-
 Room #005:
-Category: Suite
-Bedrooms: 4
-Price: 15000
-Status: Vacant
+Category: Classic
+Bedrooms: 1
+Price: 5000.00
+Status: Occupied
 
 Room #006:
-Category: Luxury Suite
-Bedrooms: 4
-Price: 15000
-Status: Vacant
+Category: De Luxe
+Bedrooms: 2
+Price: 10000.00
+Status: Occupied
 
 Room #007:
 Category: Suite
-Bedrooms: 0
-Price: 15000.00
-Status: Vacant
+Bedrooms: 3
+Price: 20000.00
+Status: Occupied
 
 Room #008:
-Category: Luxury Suite
-Bedrooms: 0
-Price: 15000.00
+Category: Imperial Grand
+Bedrooms: 5
+Price: 55000.00
+Status: Vacant
+
+Room #009:
+Category: Classic
+Bedrooms: 2
+Price: 6500.00
 Status: Occupied
+
+Room #010:
+Category: De Luxe
+Bedrooms: 3
+Price: 12500.00
+Status: Vacant
+
+Room #011:
+Category: Suite
+Bedrooms: 3
+Price: 20000.00
+Status: Occupied
+
+Room #012:
+Category: Imperial Grand
+Bedrooms: 6
+Price: 65000.00
+Status: Occupied
+
+Room #013:
+Category: Classic
+Bedrooms: 1
+Price: 5000.00
+Status: Occupied
+
+Room #014:
+Category: De Luxe
+Bedrooms: 3
+Price: 12500.00
+Status: Vacant
+
+Room #015:
+Category: Suite
+Bedrooms: 4
+Price: 25000.00
+Status: Vacant
+
+Room #016:
+Category: Imperial Grand
+Bedrooms: 5
+Price: 55000.00
+Status: Vacant
+
+Room #017:
+Category: Classic
+Bedrooms: 1
+Price: 5000.00
+Status: Vacant
+
+Room #018:
+Category: De Luxe
+Bedrooms: 2
+Price: 10000.00
+Status: Vacant
+
+Room #019:
+Category: Suite
+Bedrooms: 3
+Price: 20000.00
+Status: Vacant
+
+Room #020:
+Category: Imperial Grand
+Bedrooms: 6
+Price: 65000.00
+Status: Vacant
 

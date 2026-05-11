@@ -17,7 +17,7 @@
 #endif
 
 
-int choice;
+char choice;
 
 // ─── Structs ────
 
@@ -56,10 +56,10 @@ typedef struct {
   char code[5];
   char name[60];
   float price;
-  char type[20]; // PerNight or PerGuest
+  char type[20];
 } Amenity;
 
-// ── Collect all matching bookings first ──
+// Collect all matching bookings first
 typedef struct {
   char referenceNumber[10];
   char roomNumber[6];
@@ -73,7 +73,7 @@ typedef struct {
   int  isPaid;
 } FoundBooking;
 
-// ─── Prototypes ───
+// Prototypes
 
 void displayMenu();
 void chooseOption();
@@ -82,8 +82,10 @@ void reserve();
 void payment(const char *referenceNumber, int fromReserve);
 void registry();
 void viewDetails();
+void inquiryMenu();
 void checkout();
 
+// UTILS 
 void generateReferenceNumber(char *output);
 int readRoom(FILE *fp, Room *room);
 int readAmenities(const char *filename, Amenity *list, int maxCount);
@@ -93,8 +95,13 @@ void printWithCommas(float amount);
 char *formatPrice(float amount, char *buffer);
 void receiptGenerator(Reservation *reservation, int methodPick);
 
-// ─── Main ─────────────────────────────
+void inquiryRates();
+void inquiryAmenities();
+void inquiryRoomAvailability();
+char inqPickCategory(const char *prompt);
+int  readAllRooms(Room *rooms);
 
+// Main
 int main() {
   system("mkdir Receipts 2>nul");
 
@@ -102,63 +109,67 @@ int main() {
     displayMenu();
 
     printf("Selection: ");
-    if (scanf("%d", &choice) == 0) {
+    if (scanf("%c", &choice) == 0) {
       while (getchar() != '\n');
-      printf("Invalid input. Please enter a number.\n");
+      printf("Invalid input. Please choose between the menu.\n");
       continue;
     }
     while (getchar() != '\n');
 
+    choice = toupper(choice);
+
     switch (choice) {
-      case 1:
+      case 'A':
         listVacant();
         break;
-      case 2:
+      case 'B':
         reserve();
         break;
-      case 3: {
+      case 'C': {
           char refInput[10];
           printf("Enter Reference No: ");
           scanf("%9s", refInput);
-          while (getchar() != '\n')
-            ;
+          while (getchar() != '\n');
           payment(refInput, 0);
           break;
         }
-      case 4:
+      case 'D':
         registry();
         break;
-      case 5:
+      case 'E':
         viewDetails();
         break;
-      case 6:
+      case 'F':
+        inquiryMenu();
+        break;
+      case 'G':
         checkout();
         break;
-      case 7:
+      case 'H':
         printf("Exiting ESPLENIN HOTEL system...\n");
         break;
       default:
         printf("Invalid choice. Try again.\n");
     }
-  } while (choice != 7);
+  } while (choice != 'H');
 
   return 0;
 }
 
-// ─── Menu ─────
 void displayMenu() {
-  printf("\n====== ESPLENIN HOTEL ======\n");
-  printf("1. Vacancies\n");
-  printf("2. Reserve\n");
-  printf("3. Payment\n");
-  printf("4. Registry\n");
-  printf("5. Details\n");
-  printf("6. Checkout\n");
-  printf("7. Exit\n");
-  printf("============================\n");
+  printf("\n============== ESPLENIN HOTEL ================\n");
+  printf("[A]. Vacancies\n");
+  printf("[B]. Reserve\n");
+  printf("[C]. Payment\n");
+  printf("[D]. Registry\n");
+  printf("[E]. Details\n");
+  printf("[F]. Inquiry\n");
+  printf("[G]. Checkout\n");
+  printf("[H]. Exit\n");
+  printf("================================================\n");
 }
 
-// ─── Option 1: List Vacant Rooms ────
+// Option 1: List Vacant Rooms
 void listVacant() {
   FILE *file = fopen("rooms.txt", "r");
   if (!file) {
@@ -172,9 +183,10 @@ void listVacant() {
   printf("\n--- VACANT ROOMS ---\n");
   while (readRoom(file, &room)) {
     if (room.isAvailable){
-      printf("Room #%03d | %-40s | %d bed(s) | PHP ", room.roomNumber, room.category, room.bedrooms);
-      printWithCommas(room.pricePerNight);
-      printf("/night\n");
+      char priceStr[20];
+      printf("Room #%03d | %-15s | %d bed(s) | PHP %-11s / night\n",
+      room.roomNumber, room.category, room.bedrooms,
+      formatPrice(room.pricePerNight, priceStr));  
       foundAny = 1;
     }
   }
@@ -184,7 +196,7 @@ void listVacant() {
   fclose(file);
 }
 
-// ─── Option 2: Reserve ───
+// Option 2: Reserve
 void reserve() {
     FILE *file = fopen("rooms.txt", "r");
     if (!file) { printf("Could not open rooms.txt\n"); return; }
@@ -219,9 +231,10 @@ void reserve() {
 
     // ── Room type selection ──
     printf("\nRoom Type:\n");
-    printf("  [A] - De Luxe\n");
-    printf("  [B] - Suite\n");
-    printf("  [C] - Luxury Suite\n");
+    printf("  [A] - Classic\n");
+    printf("  [B] - De Luxe\n");
+    printf("  [C] - Suite\n");
+    printf("  [D] - Imperial Grand\n");
     printf("Choice: ");
     char roomTypePick;
     scanf("%c", &roomTypePick);
@@ -230,9 +243,10 @@ void reserve() {
 
     const char *chosenCategory;
     switch (roomTypePick) {
-      case 'A': chosenCategory = "De Luxe";      break;
-      case 'B': chosenCategory = "Suite";         break;
-      case 'C': chosenCategory = "Luxury Suite";  break;
+      case 'A': chosenCategory = "Classic";      break;
+      case 'B': chosenCategory = "De Luxe";      break;
+      case 'C': chosenCategory = "Suite";         break;
+      case 'D': chosenCategory = "Imperial Grand";  break;
       default:
         printf("Invalid room type choice.\n");
         return;
@@ -242,14 +256,14 @@ void reserve() {
     printf("\n------- AVAILABLE %s ROOMS -------\n", chosenCategory);
     int anyMatchingVacant = 0;
     for (int i = 0; i < roomCount; i++) {
-        if (rooms[i].isAvailable &&
-            strcmp(rooms[i].category, chosenCategory) == 0) {
-            printf("Room #%03d | %d bed(s) | PHP ",
-                   rooms[i].roomNumber, rooms[i].bedrooms);
-            printWithCommas(rooms[i].pricePerNight);
-            printf("/night\n");
-            anyMatchingVacant = 1;
-        }
+      if (rooms[i].isAvailable &&
+          strcmp(rooms[i].category, chosenCategory) == 0) {
+          printf("Room #%03d | %d bed(s) | PHP ",
+                  rooms[i].roomNumber, rooms[i].bedrooms);
+          printWithCommas(rooms[i].pricePerNight);
+          printf(" / night\n");
+          anyMatchingVacant = 1;
+      }
     }
 
     if (!anyMatchingVacant) {
@@ -285,6 +299,8 @@ void reserve() {
     char referenceNumber[10];
     generateReferenceNumber(referenceNumber);
 
+    char confirmReservation;
+
     // ── Reservation summary ──
     printf("\nRoom Type   : %s\n", chosenCategory);
     printf("Price/night : PHP "); printWithCommas(rooms[selectedIndex].pricePerNight); printf("\n");
@@ -295,7 +311,6 @@ void reserve() {
 
     // ── Confirm proceed ──
     printf("\nDo you want to proceed? [y/n]: ");
-    char confirmReservation;
     scanf("%c", &confirmReservation);
     while (getchar() != '\n');
 
@@ -336,7 +351,7 @@ void reserve() {
     fprintf(file, "Room Rate: %.2f\n",    roomRate);
     fprintf(file, "Amenities Used:\n");
     fprintf(file, "Amenities Total: 0.00\n");
-    fprintf(file, "Final Amount: %.2f\n", roomRate);
+    fprintf(file, "Final Amount: %.2f\n",  roomRate);
     fprintf(file, "\n");
     fprintf(file, "------- Payment Info -------\n");
     fprintf(file, "Status: Not Paid\n");
@@ -372,13 +387,13 @@ void reserve() {
         printf("Thank you for reserving. Enjoy your room.\n");
 }
 
-// ── Option 3: Payment ──
+// Option 3: Payment 
 void payment(const char *referenceNumber, int fromReserve) {
   Reservation reservation;
 
   if (!findBooking(referenceNumber, &reservation)) {
-      printf("Booking %s not found.\n", referenceNumber);
-      return;
+    printf("Booking %s not found.\n", referenceNumber);
+    return;
   }
 
   if (reservation.isPaid) {
@@ -431,7 +446,7 @@ void payment(const char *referenceNumber, int fromReserve) {
         }
 
         Amenity availableAmenities[10];
-        int     availableCount = readAmenities(filepath, availableAmenities, 10);
+        int availableCount = readAmenities(filepath, availableAmenities, 10);
 
         if (availableCount == 0) { printf("No amenities found in file.\n"); continue; }
 
@@ -590,7 +605,8 @@ void payment(const char *referenceNumber, int fromReserve) {
   } else if (methodPick == 2) {
       strcpy(reservation.paymentMethod, "Card");
 
-      char cardHolderName[50], cardNumber[20], expiryDate[8], cvv[5];
+      char cardHolderName[20], cardNumber[20], expiryDate[8], cvv[5];
+      int valid = 0, expvalid = 0;
 
       printf("\n--- Card Details ---\n");
 
@@ -598,17 +614,39 @@ void payment(const char *referenceNumber, int fromReserve) {
       fgets(cardHolderName, sizeof(cardHolderName), stdin);
       cardHolderName[strcspn(cardHolderName, "\n")] = '\0';
 
-      do {
+      while (!valid) {
         printf("Card Number (12-16 digits): ");
-        scanf("%16s", cardNumber);
-        while (getchar() != '\n');
-        if (strlen(cardNumber) < 12)
-          printf("Invalid card number. Must be 12-16 digits.\n");
-      } while (strlen(cardNumber) < 12);
+        scanf("%s", cardNumber);
 
-      printf("Expiry Date (MM/YY): ");
-      scanf("%5s", expiryDate);
-      while (getchar() != '\n');
+        int len = strlen(cardNumber);
+        int isNumeric = 1;
+
+        for (int i = 0; i < len; i++) {
+          if (!isdigit(cardNumber[i])) {
+            isNumeric = 0;
+            break;
+          }
+        }
+
+        if (!isNumeric) {
+          printf("Invalid input. Card number cannot be negative or contain letters.\n");
+        } else if (len < 12 || len > 16) {
+          printf("Invalid length. Please enter 12 to 16 digits.\n");
+        } else {
+          valid = 1;
+        }
+      }
+
+      while (!expvalid) {
+        printf("Expiry Date (MM/YY): ");
+        scanf("%s", expiryDate);
+        int len = strlen(expiryDate);
+        if (len == 5 && expiryDate[2] == '/') {
+            expvalid = 1;
+        } else {
+            printf("Invalid format. Please enter in MM/YY format (e.g. 08/27).\n");
+        }
+      }
 
       do {
         printf("CVV (3 digits)     : ");
@@ -805,7 +843,7 @@ void registry() {
     printf("Returning to main menu.\n");
 }
 
-// ─── Option 5: View Room Details ──────
+// Option 5: View Room Details 
 void viewDetails() {
   FILE *file = fopen("rooms.txt", "r");
   if (!file) {
@@ -856,7 +894,294 @@ void viewDetails() {
   printf("Status   : %s\n", selected.isAvailable ? "Vacant" : "Occupied");
 }
 
-// ─── Option 6: Checkout ───────────────
+// Option 6: Inquiry
+void inquiryMenu() {
+  int pick = 0;
+
+  do {
+    printf("\n========================================\n");
+    printf("         ESPLENIN HOTEL - INQUIRY\n");
+    printf("========================================\n");
+    printf("  [1] - Room Rates\n");
+    printf("  [2] - Amenities\n");
+    printf("  [3] - Room Availability\n");
+    printf("  [0] - Exit\n");
+    printf("========================================\n");
+    printf("Choice: ");
+
+    if (scanf("%d", &pick) == 0) {
+      while (getchar() != '\n')
+        ;
+      printf("Invalid input.\n");
+      pick = -1;
+      continue;
+    }
+    while (getchar() != '\n');
+
+    switch (pick) {
+    case 1:
+      inquiryRates();
+      break;
+    case 2:
+      inquiryAmenities();
+      break;
+    case 3:
+      inquiryRoomAvailability();
+      break;
+    case 0:
+      printf("Thank you! Have a nice day.\n");
+      break;
+    default:
+      printf("Invalid choice.\n");
+    }
+
+  } while (pick != 0);
+}
+
+void inquiryRates() {
+  Room rooms[MAX_ROOMS];
+  int roomCount = readAllRooms(rooms);
+
+  if (roomCount == 0) {
+    printf("No room data found.\n");
+    return;
+  }
+
+  char again = 'y';
+  while (tolower(again) == 'y') {
+    // Level 2: Pick category
+    char categoryChoice = inqPickCategory("\nWhich room category are you interested in?");
+    if (categoryChoice == '0')
+      return;
+
+    const char *chosenCategory;
+    switch (categoryChoice) {
+    case 'A':
+      chosenCategory = "Classic"; break;
+    case 'B':
+      chosenCategory = "De Luxe"; break;
+    case 'C':
+      chosenCategory = "Suite"; break;
+    case 'D':
+      chosenCategory = "Imperial Grand"; break;
+    default:
+      printf("Invalid choice.\n");
+      continue;
+    }
+
+    // Find max bedrooms available in this category
+    int maxBedrooms = 0;
+    for (int i = 0; i < roomCount; i++) {
+      if (strcmp(rooms[i].category, chosenCategory) == 0 &&
+          rooms[i].bedrooms > maxBedrooms)
+        maxBedrooms = rooms[i].bedrooms;
+    }
+
+    if (maxBedrooms == 0) {
+      printf("No rooms found under %s.\n", chosenCategory);
+      goto ratesAskAgain;
+    }
+
+    // Level 3: Pick bedroom count
+    int bedroomPick = 0;
+    do {
+      printf("\nHow many bedrooms? (1 - %d, max for %s): ", maxBedrooms, chosenCategory);
+      if (scanf("%d", &bedroomPick) == 0) {
+        while (getchar() != '\n');
+        printf("Invalid input.\n");
+        bedroomPick = 0;
+        continue;
+      }
+      while (getchar() != '\n');
+
+      if (bedroomPick < 1 || bedroomPick > maxBedrooms)
+        printf("No %s room has %d bedroom(s). Please enter between 1 and %d.\n",
+               chosenCategory, bedroomPick, maxBedrooms);
+
+    } while (bedroomPick < 1 || bedroomPick > maxBedrooms);
+
+    // Display: find closest match (exact or next highest)
+    printf("\n------ ROOM RATES: %s, %d bedroom(s) ------\n", chosenCategory, bedroomPick);
+
+    int found = 0;
+    for (int i = 0; i < roomCount; i++) {
+      if (strcmp(rooms[i].category, chosenCategory) == 0 &&
+          rooms[i].bedrooms == bedroomPick) {
+        printf("\nRoom #%03d | %d bed(s) | PHP ",
+               rooms[i].roomNumber, rooms[i].bedrooms);
+        printWithCommas(rooms[i].pricePerNight);
+        printf("/night | %s\n", rooms[i].isAvailable ? "Vacant" : "Occupied");
+        found = 1;
+      }
+    }
+
+    if (!found) {
+      // Show closest available bedroom count
+      printf("No exact match. Showing nearest available options:\n");
+      int closest = -1;
+      for (int i = 0; i < roomCount; i++) {
+        if (strcmp(rooms[i].category, chosenCategory) != 0)
+          continue;
+        int diff = abs(rooms[i].bedrooms - bedroomPick);
+        if (closest == -1 || diff < abs(closest - bedroomPick))
+          closest = rooms[i].bedrooms;
+      }
+      for (int i = 0; i < roomCount; i++) {
+        if (strcmp(rooms[i].category, chosenCategory) == 0 &&
+            rooms[i].bedrooms == closest) {
+          printf("Room #%03d | %d bed(s) | PHP ",
+                 rooms[i].roomNumber, rooms[i].bedrooms);
+          printWithCommas(rooms[i].pricePerNight);
+          printf("/night | %s\n", rooms[i].isAvailable ? "Vacant" : "Occupied");
+        }
+      }
+    }
+
+  ratesAskAgain:
+    printf("\nDo you have another inquiry? [y/n]: ");
+    scanf("%c", &again);
+    while (getchar() != '\n');
+  }
+}
+
+void inquiryAmenities() {
+  char again = 'y';
+
+  while (tolower(again) == 'y') {
+
+    // Level 2: Pick amenity category
+    printf("\n--- AMENITY CATEGORY ---\n");
+    printf("  [A] - Convenience\n");
+    printf("  [B] - Pool\n");
+    printf("  [C] - Spa\n");
+    printf("  [0] - Back\n");
+    printf("Choice: ");
+    char catPick;
+    scanf("%c", &catPick);
+    while (getchar() != '\n');
+    catPick = toupper(catPick);
+
+    if (catPick == '0')
+      return;
+
+    char filepath[60];
+    char categoryName[20];
+    switch (catPick){
+    case 'A':
+      strcpy(filepath, "Amenities/convenienceAmenite.txt");
+      strcpy(categoryName, "Convenience");
+      break;
+    case 'B':
+      strcpy(filepath, "Amenities/poolAmenite.txt");
+      strcpy(categoryName, "Pool");
+      break;
+    case 'C':
+      strcpy(filepath, "Amenities/spaAmenite.txt");
+      strcpy(categoryName, "Spa");
+      break;
+    default:
+      printf("Invalid choice.\n");
+      continue;
+    }
+
+    Amenity amenities[MAX_AMENITIES];
+    int amenityCount = readAmenities(filepath, amenities, MAX_AMENITIES);
+
+    if (amenityCount == 0){
+      printf("No amenities found.\n");
+      goto amenitiesAskAgain;
+    }
+
+    // Level 3: Display all amenities in chosen category
+    printf("\n------------------- %s AMENITIES -------------------\n", categoryName);
+    printf("%-6s | %-20s | %-15s | %s\n", "Code", "Name", "Price", "Billing");
+    printf("-------------------------------------------------------------\n");
+    for (int i = 0; i < amenityCount; i++){
+      char priceStr[20];
+      printf("%-6s | %-20s | PHP %-11s | %s\n",
+       amenities[i].code, amenities[i].name,
+       formatPrice(amenities[i].price, priceStr),
+       amenities[i].type);
+    }
+
+  amenitiesAskAgain:
+    printf("\nDo you have another inquiry? [y/n]: ");
+    scanf("%c", &again);
+    while (getchar() != '\n');
+  }
+}
+
+void inquiryRoomAvailability(){
+  Room rooms[MAX_ROOMS];
+  int roomCount = readAllRooms(rooms);
+
+  if (roomCount == 0) {
+    printf("No room data found.\n");
+    return;
+  }
+
+  char again = 'y';
+  while (tolower(again) == 'y'){
+
+    // Level 2: Pick category
+    char categoryChoice = inqPickCategory("\nWhich category do you want to check?");
+    if (categoryChoice == '0')
+      return;
+
+    const char *chosenCategory;
+    switch (categoryChoice) {
+    case 'A':
+      chosenCategory = "Classic";
+      break;
+    case 'B':
+      chosenCategory = "De Luxe";
+      break;
+    case 'C':
+      chosenCategory = "Suite";
+      break;
+    case 'D':
+      chosenCategory = "Imperial Grand";
+      break;
+    default:
+      printf("Invalid choice.\n");
+      continue;
+    }
+
+    int anyFound = 0;
+    for(int i = 0; i < roomCount; i++){
+      if(strcmp(rooms[i].category, chosenCategory) == 0){ anyFound = 1; break; }
+    }
+
+    if (!anyFound){
+      printf("No rooms found under %s.\n", chosenCategory);
+    } 
+    else{
+      printf("\n---------------- AVAILABILITY: %s ----------------\n", chosenCategory);
+      printf("%-10s | %-12s | %-15s | %s\n", "Room #", "Bedrooms", "Price/night", "Status");
+      printf("------------------------------------------------------\n");
+
+      for (int i = 0; i < roomCount; i++) {
+        if (strcmp(rooms[i].category, chosenCategory) == 0) {
+          char bedsStr[15];
+          char priceStr[20];
+
+          sprintf(bedsStr, "%d bed(s)", rooms[i].bedrooms);
+          formatPrice(rooms[i].pricePerNight, priceStr);
+          printf("Room #%03d  | %-12s | PHP %-11s | %s\n",
+                rooms[i].roomNumber, bedsStr, priceStr,
+                rooms[i].isAvailable ? "VACANT" : "OCCUPIED");
+          anyFound = 1;
+        }
+      }
+    }
+
+    printf("\nDo you have another inquiry? [y/n]: ");
+    scanf("%c", &again);
+    while (getchar() != '\n');
+  }
+}
+
+// Option 7:  Checkout
 void checkout() {
   printf("\n========================================\n");
   printf("           ESPLENIN - CHECKOUT\n");
@@ -995,9 +1320,7 @@ void checkout() {
   }
 }
 
-
-// ─── UTILS FUNCTIONS ──────────────────
-
+// UTILS FUNCTIONS
 void printWithCommas(float amount) {
   int wholeNumber = (int)amount;
   int centsPart = (int)((amount - wholeNumber) * 100 + 0.5f);
@@ -1238,10 +1561,10 @@ void receiptGenerator(Reservation *reservation, int methodPick) {
   // by checking RCPT-0001 up to a high number
   char testPath[50];
   for (int i = 1; i <= 9999; i++) {
-      sprintf(testPath, "Receipts/RCPT-%04d.txt", i);
-      FILE *test = fopen(testPath, "r");
-      if (test) { fclose(test); receiptCount = i; }
-      else break;
+    sprintf(testPath, "Receipts/RCPT-%04d.txt", i);
+    FILE *test = fopen(testPath, "r");
+    if (test) { fclose(test); receiptCount = i; }
+    else break;
   }
 
   int    orNumber = receiptCount + 1;
@@ -1253,8 +1576,8 @@ void receiptGenerator(Reservation *reservation, int methodPick) {
 
   FILE *file = fopen(filename, "w");
   if (!file) {
-      printf("Could not save receipt. Make sure the 'Receipts' folder exists.\n");
-      return;
+    printf("Could not save receipt. Make sure the 'Receipts' folder exists.\n");
+    return;
   }
 
   char priceBuffer[20];
@@ -1283,4 +1606,64 @@ void receiptGenerator(Reservation *reservation, int methodPick) {
 
   printf("OR No.: %s\n", orString);
   printf("Receipt saved as %s\n", filename);
+  printf("==========================================\n");
+}
+
+char inqPickCategory(const char *prompt){
+  char pick;
+  printf("%s\n", prompt);
+  printf("  [A] - Classic\n");
+  printf("  [B] - De Luxe\n");
+  printf("  [C] - Suite\n");
+  printf("  [D] - Imperial Grand\n");
+  printf("  [0] - Back\n");
+  printf("Choice: ");
+  scanf("%c", &pick);
+  while (getchar() != '\n');
+  return toupper(pick);
+}
+
+int readAllRooms(Room *rooms) {
+  FILE *file = fopen("rooms.txt", "r");
+  if (!file) {
+    printf("Could not open rooms.txt\n");
+    return 0;
+  }
+
+  char line[150];
+  int count = 0;
+  int filled = 0;
+  Room *r = &rooms[count];
+
+  while (fgets(line, sizeof(line), file)) {
+    line[strcspn(line, "\n")] = '\0';
+    line[strcspn(line, "\r")] = '\0';
+
+    if (strncmp(line, "Room #", 6) == 0) {
+      r = &rooms[count];
+      memset(r, 0, sizeof(Room));
+      sscanf(line, "Room #%d:", &r->roomNumber);
+      filled = 1;
+    }
+    else if (strncmp(line, "Category:", 9) == 0)
+      sscanf(line, "Category: %29[^\r\n]", r->category);
+    else if (strncmp(line, "Bedrooms:", 9) == 0)
+      sscanf(line, "Bedrooms: %d", &r->bedrooms);
+    else if (strncmp(line, "Price:", 6) == 0)
+      sscanf(line, "Price: %f", &r->pricePerNight);
+    else if (strncmp(line, "Status:", 7) == 0)
+      r->isAvailable = (strstr(line, "Vacant") != NULL);
+
+    if (line[0] == '\0' && filled) {
+      count++;
+      filled = 0;
+    }
+  }
+
+  // catch last block if no trailing blank line
+  if (filled)
+    count++;
+
+  fclose(file);
+  return count;
 }

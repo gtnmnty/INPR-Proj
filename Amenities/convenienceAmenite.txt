@@ -1,4 +1,24 @@
+Code: C1
+Name: Artisan Breakfast
+Price: 850.00
+Type: PerGuest
+
+Code: C2
+Name: Midnight Platter
+Price: 1500.00
+Type: PerGuest
+
 Code: E1
-Name: Extra Bed
+Name: Solo Comfort
 Price: 1000.00
+Type: PerNight
+
+Code: E2
+Name: Double Velvet
+Price: 1800.00
+Type: PerNight
+
+Code: E3
+Name: Imperial Triple
+Price: 2500.00
 Type: PerNight
