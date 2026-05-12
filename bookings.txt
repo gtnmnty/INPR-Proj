@@ -165,3 +165,75 @@ Amount Received:
 Change:
 
 ===========================================================
+
+------- Guest Info -------
+Reference No: B0008
+Room #: 007
+Room Type: Suite
+Main Guest: Aegon II
+No of Guest: 2
+Check-In: march 12, 2029
+Checkout: march 19, 2029
+No of Days: 3
+
+------- Bill Info -------
+Room Rate: 60000.00
+Amenities Used: E1
+Amenities Total: 3000.00
+Final Amount: 63000.00
+
+------- Payment Info -------
+Status: Paid
+Method: Cash
+Amount Received: 63000.00
+Change: 0.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0009
+Room #: 018
+Room Type: De Luxe
+Main Guest: Aegon II
+No of Guest: 2
+Check-In: march 19, 2029
+Checkout: march 21, 2029
+No of Days: 3
+
+------- Bill Info -------
+Room Rate: 30000.00
+Amenities Used: C2
+Amenities Total: 3000.00
+Final Amount: 33000.00
+
+------- Payment Info -------
+Status: Paid
+Method: GCash
+Amount Received: 33000.00
+Change: 0.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0010
+Room #: 015
+Room Type: Suite
+Main Guest: Aegon II
+No of Guest: 2
+Check-In: march 12, 2029
+Checkout: march 31, 2029
+No of Days: 20
+
+------- Bill Info -------
+Room Rate: 500000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 500000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================

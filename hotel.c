@@ -487,10 +487,10 @@ void payment(const char *referenceNumber, int fromReserve) {
         if (availableCount == 0) { printf("No amenities found in file.\n"); continue; }
 
         char priceBuffer[20];
-        printf("\n%-6s | %-40s | %-16s | %s\n", "Code", "Name", "Price", "Type");
+        printf("\n%-6s | %-20s | %-16s | %s\n", "Code", "Name", "Price", "Type");
         printf("-------------------------------------------------------------------------------------------\n");
         for (int i = 0; i < availableCount; i++) {
-          printf("%-6s | %-40s | PHP %-12s | %-10s\n",
+          printf("%-6s | %-20s | PHP %-12s | %-10s\n",
             availableAmenities[i].code,
             availableAmenities[i].name,
             formatPrice(availableAmenities[i].price, priceBuffer),
@@ -514,7 +514,7 @@ void payment(const char *referenceNumber, int fromReserve) {
         if (foundIndex == -1) { printf("Code not found.\n"); goto askMore; }
 
         float amenityCost = (strcmp(availableAmenities[foundIndex].type, "PerNight") == 0)
-            ? availableAmenities[foundIndex].price * reservation.numberOfDays
+            ? availableAmenities[foundIndex].price * (reservation.numberOfDays - 1)
             : availableAmenities[foundIndex].price * reservation.numberOfGuests;
 
         reservation.amenitiesTotal += amenityCost;
