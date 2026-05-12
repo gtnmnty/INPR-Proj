@@ -84,6 +84,7 @@ void registry();
 void viewDetails();
 void inquiryMenu();
 void checkout();
+void exitSystem();
 
 // UTILS 
 void generateReferenceNumber(char *output);
@@ -104,6 +105,7 @@ int  readAllRooms(Room *rooms);
 // Main
 int main() {
   system("mkdir Receipts 2>nul");
+  char tryAgain;
 
   do {
     displayMenu();
@@ -117,6 +119,21 @@ int main() {
     while (getchar() != '\n');
 
     choice = toupper(choice);
+
+    if(choice == 'H'){
+      exitSystem();
+
+      printf("Do you want to go back to main menu? [y/n]: ");
+      scanf(" %c", &tryAgain);
+      while (getchar() != '\n');
+
+      if (tolower(tryAgain) == 'n') {
+          printf("Shutting down system...\n");
+          break;
+      } else {
+        continue;
+      }
+    }
 
     switch (choice) {
       case 'A':
@@ -207,7 +224,8 @@ void reserve() {
     fclose(file);
     
     char checkIn[20], checkOut[20], guestName[50];
-    int  numberOfGuests, numberOfDays;
+    int  numberOfGuests = 0, numberOfDays = 0;
+    int valid;
 
     printf("\nCheck-In  (e.g. February 25, 2024): ");
     fgets(checkIn, sizeof(checkIn), stdin);
@@ -221,13 +239,31 @@ void reserve() {
     fgets(guestName, sizeof(guestName), stdin);
     guestName[strcspn(guestName, "\n")] = '\0';
 
-    printf("No. of Guests: ");
-    scanf("%d", &numberOfGuests);
-    while (getchar() != '\n');
+    do {
+      printf("No. of Guests: ");
+      if (scanf("%d", &numberOfGuests) == 0) {
+        while (getchar() != '\n');
+        printf("Invalid input. Please enter a number.\n");
+        numberOfGuests = 0;
+        continue;
+      }
+      while (getchar() != '\n');
 
-    printf("No. of Days  : ");
-    scanf("%d", &numberOfDays);
-    while (getchar() != '\n');
+      if (numberOfGuests <= 0)
+          printf("Guest count must be greater than 0.\n");
+    } while (numberOfGuests <= 0);
+
+    do{
+      printf("No. of Days  : ");
+      if(scanf("%d", &numberOfDays) == 0){
+        while (getchar() != '\n');
+        printf("Invalid input. Please enter a number.\n");
+        numberOfGuests = 0;
+        continue;
+      }
+      while (getchar() != '\n');
+
+    } while (numberOfDays <= 0);
 
     // ── Room type selection ──
     printf("\nRoom Type:\n");
@@ -1467,6 +1503,14 @@ void checkout() {
     printf("========================================\n");
     return;
   }
+}
+
+//Option 8: EXIT
+void exitSystem() {
+  printf("\n================================================\n");
+  printf("    Thank you for visiting ESPLENIN HOTEL!    \n");
+  printf("    We hope to see you again soon. Goodbye!   \n");
+  printf("================================================\n");
 }
 
 // UTILS FUNCTIONS
