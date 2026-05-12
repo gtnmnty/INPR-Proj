@@ -106,6 +106,7 @@ int  readAllRooms(Room *rooms);
 int main() {
   system("mkdir Receipts 2>nul");
   char tryAgain;
+  int running = 1;
 
   do {
     displayMenu();
@@ -123,16 +124,15 @@ int main() {
     if(choice == 'H'){
       exitSystem();
 
-      printf("Do you want to go back to main menu? [y/n]: ");
+      printf("\nDo you want to go back to main menu? [y/n]: ");
       scanf(" %c", &tryAgain);
       while (getchar() != '\n');
 
       if (tolower(tryAgain) == 'n') {
-          printf("Shutting down system...\n");
-          break;
-      } else {
-        continue;
+        printf("Shutting down system...\n");
+        running = 0;
       }
+      continue;
     }
 
     switch (choice) {
@@ -163,12 +163,12 @@ int main() {
         checkout();
         break;
       case 'H':
-        printf("Exiting ESPLENIN HOTEL system...\n");
+        exitSystem();
         break;
       default:
         printf("Invalid choice. Try again.\n");
     }
-  } while (choice != 'H');
+  } while (choice != 'H' || tolower(tryAgain) == 'y');
 
   return 0;
 }
@@ -197,7 +197,7 @@ void listVacant() {
   Room room;
   int foundAny = 0;
 
-  printf("\n--- VACANT ROOMS ---\n");
+  printf("\n------------------------- VACANT ROOMS -------------------------\n");
   while (readRoom(file, &room)) {
     if (room.isAvailable){
       char priceStr[20];
@@ -770,222 +770,236 @@ void payment(const char *referenceNumber, int fromReserve) {
 
 // Option 4: Registry
 void registry() {
-    char searchName[50];
-    char searchAgain;
+  char searchName[50];
+  char searchAgain;
 
-    printf("\n----------- REGISTRY -----------\n");
-    do {
-      printf("Enter full name to search: ");
-      fgets(searchName, sizeof(searchName), stdin);
-      searchName[strcspn(searchName, "\n")] = '\0';
+  printf("\n----------- REGISTRY -----------\n");
+  do {
+    printf("Enter full name to search: ");
+    fgets(searchName, sizeof(searchName), stdin);
+    searchName[strcspn(searchName, "\n")] = '\0';
 
-      FILE *file = fopen("bookings.txt", "r");
-      if (!file) { printf("Could not open bookings.txt\n"); return; }
+    FILE *file = fopen("bookings.txt", "r");
+    if (!file) { printf("Could not open bookings.txt\n"); return; }
 
-      FoundBooking results[MAX_BOOKINGS];
-      int resultCount = 0;
-      char line[200];
-      int  insideBlock = 0;
-      char cancelChoice;
+    FoundBooking results[MAX_BOOKINGS];
+    int resultCount = 0;
+    char line[200];
+    int  insideBlock = 0;
+    char cancelChoice;
 
-      // Temp vars for current block
-      char  tempRef[10]   = "";
-      char  tempRoom[6]   = "";
-      char  tempType[30]  = "";
-      char  tempName[50]  = "";
-      char  tempIn[20]    = "";
-      char  tempOut[20]   = "";
-      int   tempGuests    = 0;
-      int   tempDays      = 0;
-      float tempRate      = 0;
-      int   tempPaid      = 0;
+    char  tempRef[10]   = "";
+    char  tempRoom[6]   = "";
+    char  tempType[30]  = "";
+    char  tempName[50]  = "";
+    char  tempIn[20]    = "";
+    char  tempOut[20]   = "";
+    int   tempGuests    = 0;
+    int   tempDays      = 0;
+    float tempRate      = 0;
+    int   tempPaid      = 0;
 
-      while (fgets(line, sizeof(line), file)) {
-        line[strcspn(line, "\n")] = '\0';
+    while (fgets(line, sizeof(line), file)) {
+      line[strcspn(line, "\n")] = '\0';
 
-        if (strncmp(line, "------- Guest Info -------", 18) == 0) {
-          insideBlock = 1;
-          // reset temp vars
-          tempRef[0] = tempRoom[0] = tempType[0] = '\0';
-          tempName[0] = tempIn[0] = tempOut[0] = '\0';
-          tempGuests = tempDays = tempPaid = 0;
-          tempRate = 0;
-        }
+      if (strncmp(line, "------- Guest Info -------", 18) == 0) {
+        insideBlock = 1;
+        tempRef[0] = tempRoom[0] = tempType[0] = '\0';
+        tempName[0] = tempIn[0] = tempOut[0] = '\0';
+        tempGuests = tempDays = tempPaid = 0;
+        tempRate = 0;
+      }
 
-        if (!insideBlock) continue;
+      if (!insideBlock) continue;
 
-        if (strncmp(line, "Reference No:", 13) == 0)
-            sscanf(line, "Reference No: %9s",    tempRef);
-        else if (strncmp(line, "Room #:", 7) == 0)
-            sscanf(line, "Room #: %5s",           tempRoom);
-        else if (strncmp(line, "Room Type:", 10) == 0)
-            sscanf(line, "Room Type: %29[^\n]",   tempType);
-        else if (strncmp(line, "Main Guest:", 11) == 0)
-            sscanf(line, "Main Guest: %49[^\n]",  tempName);
-        else if (strncmp(line, "Check-In:", 9) == 0)
-            sscanf(line, "Check-In: %19[^\n]",    tempIn);
-        else if (strncmp(line, "Checkout:", 9) == 0)
-            sscanf(line, "Checkout: %19[^\n]",    tempOut);
-        else if (strncmp(line, "No of Guest:", 12) == 0)
-            sscanf(line, "No of Guest: %d",       &tempGuests);
-        else if (strncmp(line, "No of Days:", 11) == 0)
-            sscanf(line, "No of Days: %d",        &tempDays);
-        else if (strncmp(line, "Room Rate:", 10) == 0)
-            sscanf(line, "Room Rate: %f",          &tempRate);
-        else if (strncmp(line, "Status:", 7) == 0)
-            tempPaid = (strstr(line, "Not Paid") == NULL && strstr(line, "Paid") != NULL);
+      if (strncmp(line, "Reference No:", 13) == 0)
+          sscanf(line, "Reference No: %9s",    tempRef);
+      else if (strncmp(line, "Room #:", 7) == 0)
+          sscanf(line, "Room #: %5s",           tempRoom);
+      else if (strncmp(line, "Room Type:", 10) == 0)
+          sscanf(line, "Room Type: %29[^\n]",   tempType);
+      else if (strncmp(line, "Main Guest:", 11) == 0)
+          sscanf(line, "Main Guest: %49[^\n]",  tempName);
+      else if (strncmp(line, "Check-In:", 9) == 0)
+          sscanf(line, "Check-In: %19[^\n]",    tempIn);
+      else if (strncmp(line, "Checkout:", 9) == 0)
+          sscanf(line, "Checkout: %19[^\n]",    tempOut);
+      else if (strncmp(line, "No of Guest:", 12) == 0)
+          sscanf(line, "No of Guest: %d",       &tempGuests);
+      else if (strncmp(line, "No of Days:", 11) == 0)
+          sscanf(line, "No of Days: %d",        &tempDays);
+      else if (strncmp(line, "Room Rate:", 10) == 0)
+          sscanf(line, "Room Rate: %f",          &tempRate);
+      else if (strncmp(line, "Status:", 7) == 0)
+          tempPaid = (strstr(line, "Not Paid") == NULL && strstr(line, "Paid") != NULL);
 
-        if (strncmp(line, "===========", 11) == 0 && insideBlock) {
-            insideBlock = 0;
-
-          // Check if name matches (case-insensitive, full name)
-          if (strcasecmp(tempName, searchName) == 0 && resultCount < MAX_BOOKINGS) {
-            strcpy(results[resultCount].referenceNumber, tempRef);
-            strcpy(results[resultCount].roomNumber,      tempRoom);
-            strcpy(results[resultCount].roomType,        tempType);
-            strcpy(results[resultCount].guestName,       tempName);
-            strcpy(results[resultCount].checkIn,         tempIn);
-            strcpy(results[resultCount].checkOut,        tempOut);
-
-            resultCount++;
-          }
-          insideBlock = 0;
+      if (strncmp(line, "===========", 11) == 0 && insideBlock) {
+        insideBlock = 0;
+        if (strcasecmp(tempName, searchName) == 0 && resultCount < MAX_BOOKINGS) {
+          strcpy(results[resultCount].referenceNumber, tempRef);
+          strcpy(results[resultCount].roomNumber,      tempRoom);
+          strcpy(results[resultCount].roomType,        tempType);
+          strcpy(results[resultCount].guestName,       tempName);
+          strcpy(results[resultCount].checkIn,         tempIn);
+          strcpy(results[resultCount].checkOut,        tempOut);
+          resultCount++;
         }
       }
-      fclose(file);
+    }
+    fclose(file);
 
-      // Display results
-      if (resultCount == 0) {
-          printf("No bookings found for \"%s\".\n", searchName);
-      } else {
-        printf("\n------- BOOKING FOUND -------\n");
-        for (int i = 0; i < resultCount; i++) {
-          printf("Reference No    : %s\n",  results[i].referenceNumber);
-          printf("Room #          : %s\n",  results[i].roomNumber);
-          printf("Room Type       : %s\n",  results[i].roomType);
-          printf("Main Guest      : %s\n",  results[i].guestName);
-          if (i < resultCount - 1)
-            printf("-----------------------------\n");
-        }
+    if (resultCount == 0) {
+      printf("No bookings found for \"%s\".\n", searchName);
+    } else {
+      printf("\n------- BOOKING FOUND -------\n");
+      for (int i = 0; i < resultCount; i++) {
+        printf("Reference No    : %s\n",  results[i].referenceNumber);
+        printf("Room #          : %s\n",  results[i].roomNumber);
+        printf("Room Type       : %s\n",  results[i].roomType);
+        printf("Main Guest      : %s\n",  results[i].guestName);
+        if (i < resultCount - 1)
+          printf("-----------------------------\n");
+      }
 
-        int valid = 0;
+      while (1) {
+        printf("\nWould you like to cancel a reservation? [y/n]: ");
+        scanf(" %c", &cancelChoice);
+        while (getchar() != '\n');
 
-        while(!valid) {
-          printf("\nWould you like to cancel a reservation? [y/n]: ");
-          scanf(" %c", &cancelChoice);
-          while (getchar() != '\n');
+        if (toupper(cancelChoice) == 'Y') break;
+        if (toupper(cancelChoice) == 'N') goto search_again;
 
-          if (toupper(cancelChoice) == 'Y') break;
-          if (toupper(cancelChoice) == 'N') return;
+        printf("Invalid choice. Please enter Y or N only.\n");
+      }
 
-          printf("Invalid choice. Please enter Y or N only.\n");
-        }
+      char targetRef[10];
+      Reservation res;
 
-        if (tolower(cancelChoice) == 'y') {
-          char targetRef[10];
-          printf("Enter reference number to cancel: ");
-          scanf("%9s", targetRef);
-          while (getchar() != '\n');
+      while (1) {
+        printf("\nEnter reference number to cancel [0 to skip]: ");
+        scanf("%9s", targetRef);
+        while (getchar() != '\n');
 
-          Reservation res;
-          if (!findBooking(targetRef, &res)) {
-            printf("[ERROR] Reference number %s not found.\n", targetRef);
-            return;
-          }
+        if (strcmp(targetRef, "0") == 0)
+          goto search_again;
 
-          // Show what will be cancelled
-          printf("\n--- CANCELLING RESERVATION ---\n");
-          printf("Reference No : %s\n", res.referenceNumber);
-          printf("Guest        : %s\n", res.guestName);
-          printf("Room Type    : %s\n", res.roomType);
-          printf("Check-In     : %s\n", res.checkIn);
-          printf("Check-Out    : %s\n", res.checkOut);
+        // Validate: at least 2 characters, alphanumeric only
+        int isValid = 1;
+        int len = strlen(targetRef);
 
-          printf("\nAre you sure? [y/n]: ");
-          char confirm;
-          scanf("%c", &confirm);
-          while (getchar() != '\n');
-
-          if (tolower(confirm) != 'y') {
-            printf("Cancellation aborted.\n");
-            return;
-          }
-
-          // Reuse checkout's delete logic — reads all lines, skips the block
-          FILE *file = fopen("bookings.txt", "r");
-          if (!file) { printf("Could not open bookings.txt\n"); return; }
-
-          char lines[MAX_BOOKINGS][200];
-          int  totalLines = 0;
-          while (totalLines < MAX_BOOKINGS &&
-                fgets(lines[totalLines], sizeof(lines[totalLines]), file)) {
-            lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
-            totalLines++;
-          }
-          fclose(file);
-
-          int deleteStart = -1, deleteEnd = -1, inTarget = 0;
-          for (int i = 0; i < totalLines; i++) {
-            if (strncmp(lines[i], "------- Guest Info", 18) == 0)
-              inTarget = 1;
-            if (inTarget && strncmp(lines[i], "Reference No:", 13) == 0) {
-              char tmp[10];
-              sscanf(lines[i], "Reference No: %9s", tmp);
-              if (strcmp(tmp, targetRef) == 0)
-                deleteStart = i - 1;
-            }
-            if (inTarget && strncmp(lines[i], "===========", 11) == 0) {
-              if (deleteStart != -1) { deleteEnd = i; break; }
-              inTarget = 0;
-            }
-          }
-
-          file = fopen("bookings.txt", "w");
-          if (!file) { printf("Could not update bookings.txt\n"); return; }
-          for (int i = 0; i < totalLines; i++) {
-            if (deleteStart != -1 && i >= deleteStart && i <= deleteEnd)
-              continue;
-            fprintf(file, "%s\n", lines[i]);
-          }
-          fclose(file);
-
-          // Free up the room back to Vacant
-          FILE *roomFile = fopen("rooms.txt", "r");
-          Room rooms[MAX_ROOMS];
-          int  roomCount = 0;
-          while (readRoom(roomFile, &rooms[roomCount])) roomCount++;
-          fclose(roomFile);
-
-          for (int i = 0; i < roomCount; i++) {
-            if (rooms[i].roomNumber == res.roomNumber) {
-              rooms[i].isAvailable = 1;
+        if (len < 2) {
+          isValid = 0;
+        } else {
+          for (int i = 0; targetRef[i] != '\0'; i++) {
+            if (!isalnum((unsigned char)targetRef[i])) {
+              isValid = 0;
               break;
             }
           }
-
-          roomFile = fopen("rooms.txt", "w");
-          for (int i = 0; i < roomCount; i++) {
-            fprintf(roomFile, "Room #%03d:\n",  rooms[i].roomNumber);
-            fprintf(roomFile, "Category: %s\n", rooms[i].category);
-            fprintf(roomFile, "Bedrooms: %d\n", rooms[i].bedrooms);
-            fprintf(roomFile, "Price: %.2f\n",  rooms[i].pricePerNight);
-            fprintf(roomFile, "Status: %s\n",   rooms[i].isAvailable ? "Vacant" : "Occupied");
-            fprintf(roomFile, "\n");
-          }
-          fclose(roomFile);
-
-          printf("[SUCCESS] Reservation %s has been cancelled.\n", targetRef);
-          printf("------------------------------------------\n");
         }
+
+        if (!isValid) {
+          printf("[ERROR] Please enter a valid reference (e.g. B0005).\n");
+          continue;
+        }
+
+        if (!findBooking(targetRef, &res)) {
+          printf("[ERROR] Reference number %s not found.\n", targetRef);
+          continue;
+        }
+        break;
       }
-      
-      printf("\nSearch another guest? [y/n]: ");
-      scanf("%c", &searchAgain);
+
+      printf("\n--- CANCELLING RESERVATION ---\n");
+      printf("Reference No : %s\n", res.referenceNumber);
+      printf("Guest        : %s\n", res.guestName);
+      printf("Room Type    : %s\n", res.roomType);
+      printf("Check-In     : %s\n", res.checkIn);
+      printf("Check-Out    : %s\n", res.checkOut);
+
+      printf("\nAre you sure? [y/n]: ");
+      char confirm;
+      scanf(" %c", &confirm);
       while (getchar() != '\n');
 
-    } while (tolower(searchAgain) == 'y');
+      if (tolower(confirm) != 'y') {
+        printf("Cancellation aborted.\n");
+        goto search_again;
+      }
 
-    printf("Returning to main menu.\n");
+      FILE *bFile = fopen("bookings.txt", "r");
+      if (!bFile) { printf("Could not open bookings.txt\n"); return; }
+
+      char lines[MAX_BOOKINGS][200];
+      int  totalLines = 0;
+      while (totalLines < MAX_BOOKINGS &&
+             fgets(lines[totalLines], sizeof(lines[totalLines]), bFile)) {
+        lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
+        totalLines++;
+      }
+      fclose(bFile);
+
+      int deleteStart = -1, deleteEnd = -1, inTarget = 0;
+      for (int i = 0; i < totalLines; i++) {
+        if (strncmp(lines[i], "------- Guest Info", 18) == 0)
+          inTarget = 1;
+        if (inTarget && strncmp(lines[i], "Reference No:", 13) == 0) {
+          char tmp[10];
+          sscanf(lines[i], "Reference No: %9s", tmp);
+          if (strcmp(tmp, targetRef) == 0)
+            deleteStart = i - 1;
+        }
+        if (inTarget && strncmp(lines[i], "===========", 11) == 0) {
+          if (deleteStart != -1) { deleteEnd = i; break; }
+          inTarget = 0;
+        }
+      }
+
+      bFile = fopen("bookings.txt", "w");
+      if (!bFile) { printf("Could not update bookings.txt\n"); return; }
+      for (int i = 0; i < totalLines; i++) {
+        if (deleteStart != -1 && i >= deleteStart && i <= deleteEnd)
+          continue;
+        fprintf(bFile, "%s\n", lines[i]);
+      }
+      fclose(bFile);
+
+      FILE *roomFile = fopen("rooms.txt", "r");
+      Room rooms[MAX_ROOMS];
+      int  roomCount = 0;
+      while (readRoom(roomFile, &rooms[roomCount])) roomCount++;
+      fclose(roomFile);
+
+      for (int i = 0; i < roomCount; i++) {
+        if (rooms[i].roomNumber == res.roomNumber) {
+          rooms[i].isAvailable = 1;
+          break;
+        }
+      }
+
+      roomFile = fopen("rooms.txt", "w");
+      for (int i = 0; i < roomCount; i++) {
+        fprintf(roomFile, "Room #%03d:\n",  rooms[i].roomNumber);
+        fprintf(roomFile, "Category: %s\n", rooms[i].category);
+        fprintf(roomFile, "Bedrooms: %d\n", rooms[i].bedrooms);
+        fprintf(roomFile, "Price: %.2f\n",  rooms[i].pricePerNight);
+        fprintf(roomFile, "Status: %s\n",   rooms[i].isAvailable ? "Vacant" : "Occupied");
+        fprintf(roomFile, "\n");
+      }
+      fclose(roomFile);
+
+      printf("[SUCCESS] Reservation %s has been cancelled.\n", targetRef);
+      printf("------------------------------------------\n");
+    }
+
+    search_again:
+    printf("\nSearch another guest? [y/n]: ");
+    scanf(" %c", &searchAgain);
+    while (getchar() != '\n');
+
+  } while (tolower(searchAgain) == 'y');
+
+  printf("Returning to main menu.\n");
 }
 
 // Option 5: View Room Details 

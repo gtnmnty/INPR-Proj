@@ -92,7 +92,7 @@ Room #016:
 Category: Imperial Grand
 Bedrooms: 5
 Price: 55000.00
-Status: Vacant
+Status: Occupied
 
 Room #017:
 Category: Classic
