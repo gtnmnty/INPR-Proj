@@ -285,3 +285,51 @@ Amount Received:
 Change:
 
 ===========================================================
+
+------- Guest Info -------
+Reference No: B0013
+Room #: 014
+Room Type: De Luxe
+Main Guest: duncan
+No of Guest: 2
+Check-In: March 1, 2027
+Checkout: March 2, 2027
+No of Days: 1
+
+------- Bill Info -------
+Room Rate: 12500.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 12500.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0014
+Room #: 004
+Room Type: Imperial Grand
+Main Guest: baelor
+No of Guest: 2
+Check-In: March 2, 2028
+Checkout: March 4, 2028
+No of Days: 2
+
+------- Bill Info -------
+Room Rate: 90000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 90000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================

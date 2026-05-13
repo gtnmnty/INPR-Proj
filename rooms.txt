@@ -20,7 +20,7 @@ Room #004:
 Category: Imperial Grand
 Bedrooms: 4
 Price: 45000.00
-Status: Vacant
+Status: Occupied
 
 Room #005:
 Category: Classic
@@ -80,7 +80,7 @@ Room #014:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Vacant
+Status: Occupied
 
 Room #015:
 Category: Suite
