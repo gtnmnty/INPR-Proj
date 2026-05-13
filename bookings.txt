@@ -1,24 +1,24 @@
 ------- Guest Info -------
 Reference No:
-Room #: 007
-Room Type: Suite
+Room #:
+Room Type:
 Main Guest:
-No of Guest: 2
-Check-In: june 15, 2029
-Checkout: june 20, 2029
+No of Guest:
+Check-In:
+Checkout:
 No of Days: 5
 
 ------- Bill Info -------
-Room Rate: 100000.00
+Room Rate:
 Amenities Used:
 Amenities Total: 0.00
-Final Amount: 100000.00
+Final Amount:
 
 ------- Payment Info -------
 Status: Not Paid
-Method: Card
-Amount Received: 0.00
-Change: 0.00
+Method: 
+Amount Received: 
+Change:
 
 ===========================================================
 
@@ -47,27 +47,4 @@ Change: 0.00
 
 ===========================================================
 
-------- Guest Info -------
-Reference No: B0005
-Room #: 010
-Room Type: De Luxe
-Main Guest: Aegon III
-No of Guest: 3
-Check-In: june 14, 2029
-Checkout: june 20, 2029
-No of Days: 6
-
-------- Bill Info -------
-Room Rate: 75000.00
-Amenities Used: E2
-Amenities Total: 8000.00
-Final Amount: 83000.00
-
-------- Payment Info -------
-Status: Paid
-Method: Cash
-Amount Received: 120000.00
-Change: 0.00
-
-===========================================================
 

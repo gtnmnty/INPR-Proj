@@ -14,7 +14,7 @@ Room #003:
 Category: Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Occupied
+Status: Vacant
 
 Room #004:
 Category: Imperial Grand
@@ -38,7 +38,7 @@ Room #007:
 Category: Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Occupied
+Status: Vacant
 
 Room #008:
 Category: Imperial Grand
@@ -56,7 +56,7 @@ Room #010:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Occupied
+Status: Vacant
 
 Room #011:
 Category: Suite
