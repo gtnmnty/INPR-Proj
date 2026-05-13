@@ -8,7 +8,7 @@ Room #002:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Vacant
+Status: Occupied
 
 Room #003:
 Category: Suite
@@ -32,7 +32,7 @@ Room #006:
 Category: De Luxe
 Bedrooms: 2
 Price: 10000.00
-Status: Vacant
+Status: Occupied
 
 Room #007:
 Category: Suite
@@ -50,13 +50,13 @@ Room #009:
 Category: Classic
 Bedrooms: 2
 Price: 6500.00
-Status: Vacant
+Status: Occupied
 
 Room #010:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Vacant
+Status: Occupied
 
 Room #011:
 Category: Suite
@@ -80,7 +80,7 @@ Room #014:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Vacant
+Status: Occupied
 
 Room #015:
 Category: Suite
