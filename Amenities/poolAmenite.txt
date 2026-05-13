@@ -9,11 +9,11 @@ Price: 700.00
 Type: PerGuest
 
 Code: P3
-Name: Night Swim / Poolside Dinne
+Name: Night Swim
 Price: 1200.00
 Type: PerGuest
 
 Code: P4
-Name: Poolside Bar / In-Pool Massage
+Name: Poolside Bar
 Price: 1800.00
 Type: PerGuest

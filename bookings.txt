@@ -1,18 +1,18 @@
 ------- Guest Info -------
 Reference No:
-Room #: 014
-Room Type: De Luxe
+Room #: 007
+Room Type: Suite
 Main Guest:
-No of Guest: 5
-Check-In: June 12, 2029
-Checkout: June 20, 2029
-No of Days: 8
+No of Guest: 2
+Check-In: june 15, 2029
+Checkout: june 20, 2029
+No of Days: 5
 
 ------- Bill Info -------
-Room Rate: 40000.00
-Amenities Used: C1
-Amenities Total: 4250.00
-Final Amount: 44250.00
+Room Rate: 100000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 100000.00
 
 ------- Payment Info -------
 Status: Not Paid
@@ -22,29 +22,6 @@ Change: 0.00
 
 ===========================================================
 
-------- Guest Info -------
-Reference No: B0002
-Room #: 001
-Room Type: Classic
-Main Guest: Jon SNow
-No of Guest: 2
-Check-In: March 12, 2029
-Checkout: March 20, 2029
-No of Days: 8
-
-------- Bill Info -------
-Room Rate: 0.00
-Amenities Used:
-Amenities Total: 0.00
-Final Amount: 0.00
-
-------- Payment Info -------
-Status: Paid
-Method: Cash
-Amount Received: 26000.00
-Change: 0.00
-
-===========================================================
 
 ------- Guest Info -------
 Reference No: B0003
@@ -72,72 +49,25 @@ Change: 0.00
 
 ------- Guest Info -------
 Reference No: B0005
-Room #: 017
-Room Type: Classic
-Main Guest: Aegon 3
-No of Guest: 2
-Check-In: june 12, 2029
+Room #: 010
+Room Type: De Luxe
+Main Guest: Aegon III
+No of Guest: 3
+Check-In: june 14, 2029
 Checkout: june 20, 2029
-No of Days: 8
+No of Days: 6
 
 ------- Bill Info -------
-Room Rate: 40000.00
-Amenities Used: C1, C2
-Amenities Total: 4700.00
-Final Amount: 44700.00
+Room Rate: 75000.00
+Amenities Used: E2
+Amenities Total: 8000.00
+Final Amount: 83000.00
 
 ------- Payment Info -------
-Status: Not Paid
+Status: Paid
 Method: Cash
-Amount Received: 0.00
+Amount Received: 120000.00
 Change: 0.00
 
 ===========================================================
 
-------- Guest Info -------
-Reference No: B0006
-Room #: 002
-Room Type: De Luxe
-Main Guest: Aegon IV
-No of Guest: 2
-Check-In: May 21, 2029
-Checkout: May 23, 2029
-No of Days: 4
-
-------- Bill Info -------
-Room Rate: 50000.00
-Amenities Used:
-Amenities Total: 0.00
-Final Amount: 50000.00
-
-------- Payment Info -------
-Status: Not Paid
-Method:
-Amount Received:
-Change:
-
-===========================================================
-
-------- Guest Info -------
-Reference No: B0007
-Room #: 006
-Room Type: De Luxe
-Main Guest: Daeny
-No of Guest: 2
-Check-In: december 12, 2029
-Checkout: december 25, 2029
-No of Days: 4
-
-------- Bill Info -------
-Room Rate: 40000.00
-Amenities Used: P1
-Amenities Total: 600.00
-Final Amount: 40600.00
-
-------- Payment Info -------
-Status: Not Paid
-Method: Cash
-Amount Received: 0.00
-Change: 0.00
-
-===========================================================
