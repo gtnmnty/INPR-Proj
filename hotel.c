@@ -81,6 +81,7 @@ void listVacant();
 void reserve();
 void payment(const char *referenceNumber, int fromReserve);
 void registry();
+void modifyBooking(const char *targetRef);
 void viewDetails();
 void inquiryMenu();
 void checkout();
@@ -101,8 +102,10 @@ void inquiryAmenities();
 void inquiryRoomAvailability();
 char inqPickCategory(const char *prompt);
 int  readAllRooms(Room *rooms);
+int  calculateDays(const char *checkIn, const char *checkOut);
+int  monthToNumber(const char *dateStr);
+int extractDay(const char *dateStr);
 
-// Main
 int main() {
   system("mkdir Receipts 2>nul");
   char tryAgain;
@@ -227,11 +230,11 @@ void reserve() {
     int  numberOfGuests = 0, numberOfDays = 0;
     int valid;
 
-    printf("\nCheck-In  (e.g. February 25, 2024): ");
+    printf("\nCheck-In Date (MM/DD/YYYY): ");
     fgets(checkIn, sizeof(checkIn), stdin);
     checkIn[strcspn(checkIn, "\n")] = '\0';
 
-    printf("Check-Out (e.g. February 28, 2024): ");
+    printf("Check-Out Date (MM/DD/YYYY): ");
     fgets(checkOut, sizeof(checkOut), stdin);
     checkOut[strcspn(checkOut, "\n")] = '\0';
 
@@ -293,12 +296,12 @@ void reserve() {
     int anyMatchingVacant = 0;
     for (int i = 0; i < roomCount; i++) {
       if (rooms[i].isAvailable &&
-          strcmp(rooms[i].category, chosenCategory) == 0) {
-          printf("Room #%03d | %d bed(s) | PHP ",
-                  rooms[i].roomNumber, rooms[i].bedrooms);
-          printWithCommas(rooms[i].pricePerNight);
-          printf(" / night\n");
-          anyMatchingVacant = 1;
+        strcmp(rooms[i].category, chosenCategory) == 0) {
+        printf("Room #%03d | %d bed(s) | PHP ",
+                rooms[i].roomNumber, rooms[i].bedrooms);
+        printWithCommas(rooms[i].pricePerNight);
+        printf(" / night\n");
+        anyMatchingVacant = 1;
       }
     }
 
@@ -418,9 +421,9 @@ void reserve() {
     while (getchar() != '\n');
 
     if (tolower(payNow) == 'y')
-        payment(referenceNumber, 1);
+      payment(referenceNumber, 1);
     else
-        printf("Thank you for reserving. Enjoy your room.\n");
+      printf("Thank you for reserving. Enjoy your room.\n");
 }
 
 // Option 3: Payment 
@@ -772,6 +775,7 @@ void payment(const char *referenceNumber, int fromReserve) {
 void registry() {
   char searchName[50];
   char searchAgain;
+  char actionChoice;
 
   printf("\n----------- REGISTRY -----------\n");
   do {
@@ -862,53 +866,97 @@ void registry() {
       }
 
       while (1) {
-        printf("\nWould you like to cancel a reservation? [y/n]: ");
-        scanf(" %c", &cancelChoice);
+        printf("\nWhat would you like to do?\n");
+        printf("  [C] - Cancel Reservation\n");
+        printf("  [M] - Modify Reservation\n");
+        printf("  [N] - Nothing, go back\n");
+        printf("Choice: ");
+        scanf(" %c", &actionChoice);
         while (getchar() != '\n');
+        actionChoice = toupper(actionChoice);
 
-        if (toupper(cancelChoice) == 'Y') break;
-        if (toupper(cancelChoice) == 'N') goto search_again;
-
-        printf("Invalid choice. Please enter Y or N only.\n");
+        if (actionChoice == 'C' || actionChoice == 'M' || actionChoice == 'N') break;
+        printf("Invalid choice. Please enter C, M, or N.\n"); 
       }
 
       char targetRef[10];
       Reservation res;
 
-      while (1) {
-        printf("\nEnter reference number to cancel [0 to skip]: ");
-        scanf("%9s", targetRef);
-        while (getchar() != '\n');
 
-        if (strcmp(targetRef, "0") == 0)
-          goto search_again;
+      if (actionChoice == 'N') return;
+      if (actionChoice == 'M') {
+        if (resultCount > 1) {
+          // show all found bookings so user can pick
+          printf("\nThis guest has multiple reservations:\n");
+          for (int i = 0; i < resultCount; i++) {
+            printf("  [%d] Ref: %s | Room: %s | Check-In: %s\n",
+              i + 1,
+              results[i].referenceNumber,
+              results[i].roomType,
+              results[i].checkIn);
+          }
 
-        // Validate: at least 2 characters, alphanumeric only
-        int isValid = 1;
-        int len = strlen(targetRef);
+          do {
+            printf("Enter Reference Number to modify: ");
+            scanf("%9s", targetRef);
+            while (getchar() != '\n');
 
-        if (len < 2) {
-          isValid = 0;
-        } else {
-          for (int i = 0; targetRef[i] != '\0'; i++) {
-            if (!isalnum((unsigned char)targetRef[i])) {
-              isValid = 0;
-              break;
+            // validate it belongs to the found results
+            int valid = 0;
+            for (int i = 0; i < resultCount; i++) {
+              if (strcmp(results[i].referenceNumber, targetRef) == 0) {
+                valid = 1;
+                break;
+              }
             }
+            
+            if (!valid)
+              printf("Invalid. Please enter one of the reference numbers above.\n");
+            else
+              break;
+          } while (1);
+        } else {
+        strcpy(targetRef, results[0].referenceNumber);
+      }
+
+      modifyBooking(targetRef);
+      goto search_again;
+    }
+
+    if (actionChoice == 'C' || actionChoice == 'c') {
+      printf("\nEnter reference number to cancel [0 to skip]: ");
+      scanf("%9s", targetRef);
+      while (getchar() != '\n');
+
+      if (strcmp(targetRef, "0") == 0)
+        goto search_again;
+
+      // Validate: at least 2 characters, alphanumeric only
+      int isValid = 1;
+      int len = strlen(targetRef);
+
+      if (len < 2) {
+        isValid = 0;
+      } else {
+        for (int i = 0; targetRef[i] != '\0'; i++) {
+          if (!isalnum((unsigned char)targetRef[i])) {
+            isValid = 0;
+            break;
           }
         }
-
-        if (!isValid) {
-          printf("[ERROR] Please enter a valid reference (e.g. B0005).\n");
-          continue;
-        }
-
-        if (!findBooking(targetRef, &res)) {
-          printf("[ERROR] Reference number %s not found.\n", targetRef);
-          continue;
-        }
-        break;
       }
+
+      if (!isValid) {
+        printf("[ERROR] Please enter a valid reference (e.g. B0005).\n");
+        continue;
+      }
+
+      if (!findBooking(targetRef, &res)) {
+        printf("[ERROR] Reference number %s not found.\n", targetRef);
+        continue;
+      }
+      break;
+    }
 
       printf("\n--- CANCELLING RESERVATION ---\n");
       printf("Reference No : %s\n", res.referenceNumber);
@@ -1000,6 +1048,287 @@ void registry() {
   } while (tolower(searchAgain) == 'y');
 
   printf("Returning to main menu.\n");
+}
+
+void modifyBooking(const char *targetRef) {
+  Reservation res;
+
+  if (!findBooking(targetRef, &res)) {
+    printf("Booking %s not found.\n", targetRef);
+    return;
+  }
+
+  if (res.numberOfDays > 0)
+    res.pricePerNight = res.roomRate / res.numberOfDays;
+
+  // Display current details
+  // printf("\n--- CURRENT BOOKING DETAILS ---\n");
+  // printf("Reference No   : %s\n", res.referenceNumber);
+  // printf("Guest Name     : %s\n", res.guestName);
+  // printf("No. of Guests  : %d\n", res.numberOfGuests);
+  // printf("Check-In       : %s\n", res.checkIn);
+  // printf("Check-Out      : %s\n", res.checkOut);
+  // printf("No. of Days    : %d\n", res.numberOfDays);
+  // printf("Room Type      : %s\n", res.roomType);
+  // printf("Price/night    : PHP "); printWithCommas(res.pricePerNight); printf("\n");
+  // printf("Room Rate      : PHP "); printWithCommas(res.roomRate);      printf("\n");
+  // printf("Amenities      : PHP "); printWithCommas(res.amenitiesTotal); printf("\n");
+  // printf("Final Amount   : PHP "); printWithCommas(res.finalAmount);   printf("\n");
+
+  // Modification menu
+  int modChoice = 0;
+  do {
+    printf("\nWhat would you like to modify?\n");
+    printf("  [1] - Guest Name\n");
+    printf("  [2] - Check-In / Check-Out Dates\n");
+    printf("  [3] - Number of Guests\n");
+    printf("  [4] - Room Upgrade / Change\n");
+    printf("  [5] - Amenities (Add / Remove)\n");
+    printf("  [0] - Cancel (keep current details)\n");
+    printf("Selection: ");
+    if (scanf("%d", &modChoice) == 0) {
+      while (getchar() != '\n');
+      modChoice = -1;
+    }
+    while (getchar() != '\n');
+    if (modChoice < 0 || modChoice > 5)
+      printf("Invalid choice.\n");
+  } while (modChoice < 0 || modChoice > 5);
+
+  if (modChoice == 0) {
+    printf("No changes made.\n");
+    return;
+  }
+
+  // Load all lines from bookings.txt 
+  FILE *file = fopen("bookings.txt", "r");
+  if (!file) { printf("Could not open bookings.txt\n"); return; }
+
+  char lines[MAX_BOOKINGS][200];
+  int  totalLines = 0;
+  while (totalLines < MAX_BOOKINGS &&
+      fgets(lines[totalLines], sizeof(lines[totalLines]), file)) {
+    lines[totalLines][strcspn(lines[totalLines], "\n")] = '\0';
+    totalLines++;
+  }
+  fclose(file);
+
+  // Find the target block 
+  int inTarget = 0;
+  for (int i = 0; i < totalLines; i++) {
+    if (strncmp(lines[i], "Reference No:", 13) == 0) {
+      char tmp[10];
+      sscanf(lines[i], "Reference No: %9s", tmp);
+      inTarget = (strcmp(tmp, targetRef) == 0);
+    }
+    if (!inTarget) continue;
+
+    // Case 1: Guest Name
+    if (modChoice == 1 && strncmp(lines[i], "Main Guest:", 11) == 0) {
+      char newName[50];
+      printf("New Guest Name: ");
+      fgets(newName, sizeof(newName), stdin);
+      newName[strcspn(newName, "\n")] = '\0';
+      sprintf(lines[i], "Main Guest: %s", newName);
+      printf("Guest name updated to: %s\n", newName);
+      break;
+    }
+
+    // ── Case 2: Check-In / Check-Out + recalculate
+    if (modChoice == 2 && strncmp(lines[i], "Check-In:", 9) == 0) {
+      char newIn[20], newOut[20];
+
+      printf("New Check-In (e.g. March 12, 2029): ");
+      fgets(newIn, sizeof(newIn), stdin);
+      newIn[strcspn(newIn, "\n")] = '\0';
+
+      printf("New Check-Out (e.g. March 17, 2029): ");
+      fgets(newOut, sizeof(newOut), stdin);
+      newOut[strcspn(newOut, "\n")] = '\0';
+
+      int newDays = calculateDays(newIn, newOut);
+      if (newDays <= 0) {
+        printf("Invalid dates. Check-out must be after check-in.\n");
+        return;
+      }
+
+      // Recalculate costs
+      float newRoomRate    = res.pricePerNight * newDays;
+      float newFinalAmount = newRoomRate + res.amenitiesTotal;
+
+      // Update check-in line
+      sprintf(lines[i], "Check-In: %s", newIn);
+
+      // Find and update the rest in the same block
+      for (int j = i + 1; j < totalLines; j++) {
+        if (strncmp(lines[j], "Checkout:", 9) == 0)
+          sprintf(lines[j], "Checkout: %s", newOut);
+        else if (strncmp(lines[j], "No of Days:", 11) == 0)
+          sprintf(lines[j], "No of Days: %d", newDays);
+        else if (strncmp(lines[j], "Room Rate:", 10) == 0)
+          sprintf(lines[j], "Room Rate: %.2f", newRoomRate);
+        else if (strncmp(lines[j], "Final Amount:", 13) == 0)
+          sprintf(lines[j], "Final Amount: %.2f", newFinalAmount);
+        else if (strncmp(lines[j], "===========", 11) == 0)
+          break;
+      }
+
+      printf("\nDates updated.\n");
+      printf("New No. of Days  : %d\n",    newDays);
+      printf("New Room Rate    : PHP ");    printWithCommas(newRoomRate);    printf("\n");
+      printf("New Final Amount : PHP ");    printWithCommas(newFinalAmount); printf("\n");
+      break;
+    }
+
+    //  Case 3: Update Number of Guests
+    if (modChoice == 3 && strncmp(lines[i], "No of Guest:", 12) == 0) {
+      int newGuests = 0;
+      do {
+        printf("New Number of Guests: ");
+        if (scanf("%d", &newGuests) == 0) {
+          while (getchar() != '\n');
+          newGuests = 0;
+          printf("Invalid input.\n");
+          continue;
+        }
+        while (getchar() != '\n');
+        if (newGuests <= 0)
+          printf("Must be greater than 0.\n");
+      } while (newGuests <= 0);
+
+      sprintf(lines[i], "No of Guest: %d", newGuests);
+      printf("Number of guests updated to: %d\n", newGuests);
+      break;
+    }
+
+    if (modChoice == 4 && strncmp(lines[i], "Room Type:", 10) == 0) {
+      // Show available rooms
+      FILE *roomFile = fopen("rooms.txt", "r");
+      if (!roomFile) { printf("Could not open rooms.txt\n"); return; }
+
+      Room rooms[MAX_ROOMS];
+      int  roomCount = 0;
+      while (readRoom(roomFile, &rooms[roomCount])) roomCount++;
+      fclose(roomFile);
+
+      printf("\nSelect new room category:\n");
+      printf("  [A] - Classic\n");
+      printf("  [B] - De Luxe\n");
+      printf("  [C] - Suite\n");
+      printf("  [D] - Imperial Grand\n");
+      printf("Choice: ");
+      char typePick;
+      scanf("%c", &typePick);
+      while (getchar() != '\n');
+      typePick = toupper(typePick);
+
+      const char *newCategory;
+      switch (typePick) {
+        case 'A': newCategory = "Classic";        break;
+        case 'B': newCategory = "De Luxe";        break;
+        case 'C': newCategory = "Suite";           break;
+        case 'D': newCategory = "Imperial Grand";  break;
+        default:  printf("Invalid choice.\n"); return;
+      }
+
+      // Show vacant rooms in new category
+      printf("\n--- AVAILABLE %s ROOMS ---\n", newCategory);
+      int anyVacant = 0;
+      for (int r = 0; r < roomCount; r++) {
+        if (rooms[r].isAvailable &&
+          strcmp(rooms[r].category, newCategory) == 0) {
+          char priceStr[20];
+          printf("Room #%03d | %d bed(s) | PHP %s/night\n",
+            rooms[r].roomNumber, rooms[r].bedrooms,
+            formatPrice(rooms[r].pricePerNight, priceStr));
+          anyVacant = 1;
+        }
+      }
+      
+      if (!anyVacant) {
+        printf("No vacant %s rooms available.\n", newCategory);
+        return;
+      }
+
+      // Pick new room
+      int newRoomPick = -1, newRoomIdx = -1;
+      do {
+        printf("Enter new room number: ");
+        scanf("%d", &newRoomPick);
+        while (getchar() != '\n');
+        for (int r = 0; r < roomCount; r++) {
+          if (rooms[r].roomNumber == newRoomPick &&
+            rooms[r].isAvailable &&
+            strcmp(rooms[r].category, newCategory) == 0) {
+            newRoomIdx = r;
+            break;
+          }
+        }
+        if (newRoomIdx == -1)
+          printf("Invalid. Please choose from the list above.\n");
+      } while (newRoomIdx == -1);
+
+      float newPricePerNight = rooms[newRoomIdx].pricePerNight;
+      float newRoomRate      = newPricePerNight * res.numberOfDays;
+      float newFinalAmount   = newRoomRate + res.amenitiesTotal;
+
+      // Free old room → Vacant
+      for (int r = 0; r < roomCount; r++) {
+        if (rooms[r].roomNumber == res.roomNumber) {
+          rooms[r].isAvailable = 1;
+        }
+        if (rooms[r].roomNumber == newRoomPick) {
+          rooms[r].isAvailable = 0;
+        }
+      }
+      roomFile = fopen("rooms.txt", "w");
+      if (!roomFile) { printf("Could not update rooms.txt\n"); return; }
+      for (int r = 0; r < roomCount; r++) {
+        fprintf(roomFile, "Room #%03d:\n",  rooms[r].roomNumber);
+        fprintf(roomFile, "Category: %s\n", rooms[r].category);
+        fprintf(roomFile, "Bedrooms: %d\n", rooms[r].bedrooms);
+        fprintf(roomFile, "Price: %.2f\n",  rooms[r].pricePerNight);
+        fprintf(roomFile, "Status: %s\n",   rooms[r].isAvailable ? "Vacant" : "Occupied");
+        fprintf(roomFile, "\n");
+      }
+      fclose(roomFile);
+
+      // Update booking lines
+      sprintf(lines[i], "Room Type: %s", newCategory);
+      for (int j = i - 1; j >= 0; j--) {  // Room # is before Room Type
+        if (strncmp(lines[j], "Room #:", 7) == 0) {
+          sprintf(lines[j], "Room #: %03d", newRoomPick);
+          break;
+        }
+      }
+
+      for (int j = i + 1; j < totalLines; j++) {
+        if (strncmp(lines[j], "Room Rate:", 10) == 0)
+          sprintf(lines[j], "Room Rate: %.2f", newRoomRate);
+        else if (strncmp(lines[j], "Final Amount:", 13) == 0)
+          sprintf(lines[j], "Final Amount: %.2f", newFinalAmount);
+        else if (strncmp(lines[j], "===========", 11) == 0)
+          break;
+      }
+
+      printf("\nRoom upgraded to #%03d (%s).\n", newRoomPick, newCategory);
+      printf("New Price/night  : PHP "); printWithCommas(newPricePerNight); printf("\n");
+      printf("New Room Rate    : PHP "); printWithCommas(newRoomRate);      printf("\n");
+      printf("New Final Amount : PHP "); printWithCommas(newFinalAmount);   printf("\n");
+      break;
+    }
+
+    if (strncmp(lines[i], "===========", 11) == 0) inTarget = 0;
+  }
+
+  // Write back to bookings.txt 
+  file = fopen("bookings.txt", "w");
+  if (!file) { printf("Could not save changes.\n"); return; }
+  for (int i = 0; i < totalLines; i++)
+      fprintf(file, "%s\n", lines[i]);
+  fclose(file);
+
+  printf("\nBooking %s has been updated successfully.\n", targetRef);
 }
 
 // Option 5: View Room Details 
@@ -1874,3 +2203,54 @@ int readAllRooms(Room *rooms) {
   fclose(file);
   return count;
 }
+
+int extractDay(const char *dateStr) {
+  // format: "Month DD, YYYY"
+  // find the first space, then read the number after it
+  const char *p = strchr(dateStr, ' ');
+  if (!p) return -1;
+  int day = 0;
+  sscanf(p + 1, "%d", &day);
+  return day > 0 ? day : -1;
+}
+
+int monthToNumber(const char *dateStr) {
+  char month[20] = "";
+  sscanf(dateStr, "%19s", month);
+
+  if (strcasecmp(month, "January")   == 0) return 1;
+  if (strcasecmp(month, "February")  == 0) return 2;
+  if (strcasecmp(month, "March")     == 0) return 3;
+  if (strcasecmp(month, "April")     == 0) return 4;
+  if (strcasecmp(month, "May")       == 0) return 5;
+  if (strcasecmp(month, "June")      == 0) return 6;
+  if (strcasecmp(month, "July")      == 0) return 7;
+  if (strcasecmp(month, "August")    == 0) return 8;
+  if (strcasecmp(month, "September") == 0) return 9;
+  if (strcasecmp(month, "October")   == 0) return 10;
+  if (strcasecmp(month, "November")  == 0) return 11;
+  if (strcasecmp(month, "December")  == 0) return 12;
+  return -1;
+}
+
+int calculateDays(const char *checkIn, const char *checkOut) {
+  char monthIn[20]  = "", monthOut[20] = "";
+  int  dayIn = 0,  dayOut = 0;
+  int  yearIn = 0, yearOut = 0;
+
+  sscanf(checkIn,  "%19s %d, %d", monthIn,  &dayIn,  &yearIn);
+  sscanf(checkOut, "%19s %d, %d", monthOut, &dayOut, &yearOut);
+
+  int mIn  = monthToNumber(monthIn);
+  int mOut = monthToNumber(monthOut);
+
+  if (mIn == -1 || mOut == -1) return -1;
+
+  // Convert to a simple day count (days since year 0, roughly)
+  // Using formula: total days = year*365 + month*30 + day (approximate)
+  int totalIn  = yearIn  * 365 + mIn  * 30 + dayIn;
+  int totalOut = yearOut * 365 + mOut * 30 + dayOut;
+
+  return totalOut - totalIn;
+}
+
