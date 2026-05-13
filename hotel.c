@@ -460,6 +460,8 @@ void payment(const char *referenceNumber, int fromReserve) {
       return;
   }
 
+  if (reservation.pricePerNight == 0 && reservation.numberOfDays > 0)
+    reservation.pricePerNight = reservation.roomRate / reservation.numberOfDays;
 
   printf("\n------- Payment -------\n");
   printf("Input Reference No.  :  %s\n", reservation.referenceNumber);
@@ -489,6 +491,7 @@ void payment(const char *referenceNumber, int fromReserve) {
         printf("  [C] - Spa\n");
         printf("  [N] - No Amenities\n");
         printf("Choice: ");
+
         char categoryPick;
         scanf("%c", &categoryPick);
         while (getchar() != '\n');
@@ -1437,7 +1440,7 @@ void checkout() {
     if (!reservation.isPaid) {
       printf("\nWarning: This booking has not been paid yet.\n");
       printf("Please settle payment before checking out.\n");
-      return;
+      payment(referenceInput, 0);
     }
 
 

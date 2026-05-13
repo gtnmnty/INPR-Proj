@@ -22,7 +22,6 @@ Change:
 
 ===========================================================
 
-
 ------- Guest Info -------
 Reference No: B0003
 Room #: 009
@@ -47,4 +46,122 @@ Change: 0.00
 
 ===========================================================
 
+------- Guest Info -------
+Reference No: B0003
+Room #: 012
+Room Type: Imperial Grand
+Main Guest: Jon Snow
+No of Guest: 8
+Check-In: June 12, 2029
+Checkout: June 19, 2029
+No of Days: 8
 
+------- Bill Info -------
+Room Rate: 520000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 520000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0004
+Room #: 015
+Room Type: Suite
+Main Guest: Code 47
+No of Guest: 31
+Check-In: Septemver 1, 2029
+Checkout: September 31, 2029
+No of Days: 31
+
+------- Bill Info -------
+Room Rate: 775000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 775000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0005
+Room #: 006
+Room Type: De Luxe
+Main Guest: Jon Snow
+No of Guest: 2
+Check-In: November 20, 2029
+Checkout: November 32, 2029
+No of Days: 13
+
+------- Bill Info -------
+Room Rate: 130000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 130000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0006
+Room #: 001
+Room Type: Classic
+Main Guest: Daeny
+No of Guest: 1
+Check-In: january 1, 2029
+Checkout: january 3, 2029
+No of Days: 2
+
+------- Bill Info -------
+Room Rate: 13000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 13000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0007
+Room #: 018
+Room Type: De Luxe
+Main Guest: Ned 
+No of Guest: 2
+Check-In: February 12, 2029
+Checkout: February 24, 2029
+No of Days: 12
+
+------- Bill Info -------
+Room Rate: 120000.00
+Amenities Used: P2, E1
+Amenities Total: 12400.00
+Final Amount: 132400.00
+
+------- Payment Info -------
+Status: Paid
+Method: Card
+Amount Received: 132400.00
+Change: 0.00
+
+===========================================================
