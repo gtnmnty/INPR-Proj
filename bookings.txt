@@ -119,30 +119,6 @@ Change:
 ===========================================================
 
 ------- Guest Info -------
-Reference No: B0006
-Room #: 001
-Room Type: Classic
-Main Guest: Daeny
-No of Guest: 1
-Check-In: january 1, 2029
-Checkout: january 3, 2029
-No of Days: 2
-
-------- Bill Info -------
-Room Rate: 13000.00
-Amenities Used:
-Amenities Total: 0.00
-Final Amount: 13000.00
-
-------- Payment Info -------
-Status: Not Paid
-Method:
-Amount Received:
-Change:
-
-===========================================================
-
-------- Guest Info -------
 Reference No: B0007
 Room #: 018
 Room Type: De Luxe

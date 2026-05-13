@@ -936,7 +936,6 @@ void registry() {
         printf("[ERROR] Reference number %s not found.\n", targetRef);
         continue;
       }
-      break;
     }
 
       printf("\n--- CANCELLING RESERVATION ---\n");
