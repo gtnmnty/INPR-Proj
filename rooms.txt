@@ -2,19 +2,19 @@ Room #001:
 Category: Classic
 Bedrooms: 2
 Price: 6500.00
-Status: Vacant
+Status: Occupied
 
 Room #002:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Vacant
+Status: Occupied
 
 Room #003:
 Category: Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Vacant
+Status: Occupied
 
 Room #004:
 Category: Imperial Grand
@@ -26,7 +26,7 @@ Room #005:
 Category: Classic
 Bedrooms: 1
 Price: 5000.00
-Status: Vacant
+Status: Occupied
 
 Room #006:
 Category: De Luxe
@@ -38,7 +38,7 @@ Room #007:
 Category: Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Vacant
+Status: Occupied
 
 Room #008:
 Category: Imperial Grand
@@ -56,13 +56,13 @@ Room #010:
 Category: De Luxe
 Bedrooms: 3
 Price: 12500.00
-Status: Vacant
+Status: Occupied
 
 Room #011:
 Category: Suite
 Bedrooms: 3
 Price: 20000.00
-Status: Vacant
+Status: Occupied
 
 Room #012:
 Category: Imperial Grand
@@ -74,7 +74,7 @@ Room #013:
 Category: Classic
 Bedrooms: 1
 Price: 5000.00
-Status: Vacant
+Status: Occupied
 
 Room #014:
 Category: De Luxe
@@ -98,7 +98,7 @@ Room #017:
 Category: Classic
 Bedrooms: 1
 Price: 5000.00
-Status: Vacant
+Status: Occupied
 
 Room #018:
 Category: De Luxe
