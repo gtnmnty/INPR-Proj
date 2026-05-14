@@ -233,6 +233,7 @@ void reserve() {
   int anyMatchingVacant = 0;
   char roomTypePick;
   const char *chosenCategory;
+  char payNow;
 
   time_t t = time(NULL);
   struct tm *now = localtime(&t);
@@ -275,7 +276,7 @@ void reserve() {
       continue;
     }
     while (getchar() != '\n');
-
+    
     if (numberOfGuests <= 0)
         printf("Guest count must be greater than 0.\n");
   } while (numberOfGuests <= 0);
@@ -375,15 +376,19 @@ void reserve() {
   printf("Your reference no: %s\n", referenceNumber);
   printf("_____________________________________________\n");
 
-  printf("\nDo you want to proceed? [y/n]: ");
-  scanf("%c", &confirmReservation);
-  while (getchar() != '\n');
+  do{
+    printf("\nDo you want to proceed? [y/n]: ");
+    scanf("%c", &confirmReservation);
+    while (getchar() != '\n');
 
-  if (tolower(confirmReservation) != 'y') {
-      printf("Reservation cancelled. Returning to main menu.\n");
+    if(toupper(confirmReservation) == 'N'){
+      printf("Reservation is cancelled.\n");
       return;
-  }
+    }
 
+    printf("Invalid Choice. Please Choose between the options\n");
+
+  } while(toupper(confirmReservation) != 'Y');
 
   rooms[selectedIndex].isAvailable = 0;
   file = fopen("rooms.txt", "w");
@@ -440,15 +445,23 @@ void reserve() {
   printf("  Room Rate          :  PHP ");  printWithCommas(roomRate); printf("\n");
 
 
-  printf("\nDo you want to proceed to payment? [y/n]: ");
-  char payNow;
-  scanf("%c", &payNow);
-  while (getchar() != '\n');
+  do{
+    printf("\nDo you want to proceed to payment? [y/n]: ");
+    scanf("%c", &payNow);
+    while (getchar() != '\n');
 
-  if (tolower(payNow) == 'y')
-    payment(referenceNumber, 1);
-  else
-    printf("Thank you for reserving. Enjoy your room.\n");
+    if (tolower(payNow) == 'y')
+      payment(referenceNumber, 1);
+    
+    if(tolower(payNow) == 'n')
+      printf("Thank you for reserving. Enjoy your room.\n");
+    
+    if(payNow == 0) 
+      return;
+    
+    printf("Thank you for reserving! You can pay later.\n");
+
+  } while (tolower(payNow) != 'y' && tolower(payNow) != 'n' && payNow != '0');
 }
 
 void bookingLookup() {
@@ -468,8 +481,8 @@ void bookingLookup() {
     }
 
     if (strlen(searchName) == 0) {
-        printf("Name cannot be empty. Try again.\n");
-        continue;
+      printf("Name cannot be empty. Try again.\n");
+      continue;
     }
 
     file = fopen("bookings.txt", "r");
@@ -567,7 +580,6 @@ void bookingLookup() {
       printf("-----------------------------------------------\n");
     }
 
-    printf("-----------------------------------------------\n");
     printf("Total booking(s) found: %d\n", foundCount);
     return;
   }
@@ -591,8 +603,8 @@ void payment(const char *referenceNumber, int fromReserve) {
   }
 
   if (reservation.isPaid) {
-      printf("Booking %s is already paid.\n", referenceNumber);
-      return;
+    printf("Booking %s is already paid.\n", referenceNumber);
+    return;
   }
 
   if (reservation.pricePerNight == 0 && reservation.numberOfDays > 0)
@@ -615,10 +627,18 @@ void payment(const char *referenceNumber, int fromReserve) {
       int selectedCount = 0;
       char addMore = 'y';
 
-      printf("\nWould you like to add Amenities? [y/n]: ");
-      scanf("%c", &addMore);
-      while (getchar() != '\n');
+      do{
+        printf("\nWould you like to add Amenities? [y/n]: ");
+        scanf("%c", &addMore);
+        while (getchar() != '\n');
 
+        addMore = tolower(addMore);
+
+        if(addMore != 'y' || addMore !='n'){
+          printf("Y or N only.\n");
+        }
+      } while(addMore != 'y' && addMore != 'n');
+      
       while (tolower(addMore) == 'y') {
         printf("\n----- AMENITIES -----\n");
         printf("  [A] - Convenience\n");
@@ -687,11 +707,19 @@ void payment(const char *referenceNumber, int fromReserve) {
         printf("\n");
 
         askMore:
-        printf("Add another amenity? [y/n]: ");
-        scanf("%c", &addMore);
-        while (getchar() != '\n');
-      }
+        do{
+          printf("\nAdd another amenity? [y/n]: ");
+          scanf(" %c", &addMore);
+          while (getchar() != '\n');
 
+          addMore = tolower(addMore);
+
+          if(addMore != 'y' || addMore !='n'){
+            printf("Y or N only.\n");
+          }
+
+        }while(addMore != 'y' && addMore !='n');
+      }
 
       if (selectedCount > 0) {
         FILE *file = fopen("bookings.txt", "r");
