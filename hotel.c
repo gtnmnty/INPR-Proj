@@ -341,7 +341,6 @@ void reserve() {
     return;
   }
 
-
   int selectedIndex = -1;
   do {
     int roomPick;
@@ -445,21 +444,27 @@ void reserve() {
   printf("  Room Rate          :  PHP ");  printWithCommas(roomRate); printf("\n");
 
 
-  do{
+  do {
     printf("\nDo you want to proceed to payment? [y/n]: ");
-    scanf("%c", &payNow);
+    scanf(" %c", &payNow);
     while (getchar() != '\n');
 
-    if (tolower(payNow) == 'y')
-      payment(referenceNumber, 1);
-    
-    if(tolower(payNow) == 'n')
-      printf("Thank you for reserving. Enjoy your room.\n");
-    
-    if(payNow == 0) 
-      printf("Thank you for reserving! You can pay later.\n");
-      return;
+    if (tolower(payNow) == 'y') {
+        payment(referenceNumber, 1);
+        return;
+    }
 
+    if (tolower(payNow) == 'n') {
+      printf("Thank you for reserving. Enjoy your room.\n");
+      return;
+    }
+
+    if (payNow == '0') {
+        printf("Thank you for reserving! You can pay later.\n");
+        return;
+    }
+
+    printf("Invalid input. Enter y, n, or 0 only.\n");
   } while (tolower(payNow) != 'y' && tolower(payNow) != 'n' && payNow != '0');
 }
 
@@ -644,7 +649,7 @@ void payment(const char *referenceNumber, int fromReserve) {
 
         addMore = tolower(addMore);
 
-        if(addMore != 'y' || addMore !='n'){
+        if(addMore != 'y' && addMore !='n'){
           printf("Y or N only.\n");
         }
       } while(addMore != 'y' && addMore != 'n');
@@ -884,13 +889,39 @@ void payment(const char *referenceNumber, int fromReserve) {
 
       while (!expvalid) {
         printf("Expiry Date (MM/YY): ");
-        scanf("%s", expiryDate);
+        scanf("%5s", expiryDate);
+        while (getchar() != '\n');
+
         int len = strlen(expiryDate);
-        if (len == 5 && expiryDate[2] == '/') {
-            expvalid = 1;
-        } else {
-            printf("Invalid format. Please enter in MM/YY format (e.g. 08/27).\n");
+
+        if (len != 5 || expiryDate[2] != '/') {
+          printf("Invalid format. Use MM/YY (e.g. 08/27).\n");
+          continue;
         }
+
+        int validChars = 1;
+        for (int i = 0; i < 5; i++) {
+          if (i == 2) continue;
+          if (!isdigit(expiryDate[i])) { validChars = 0; break; }
+        }
+        if (!validChars) {
+          printf("Numbers only. No letters.\n");
+          continue;
+        }
+
+        int expMonth = (expiryDate[0] - '0') * 10 + (expiryDate[1] - '0');
+        int expYear  = (expiryDate[3] - '0') * 10 + (expiryDate[4] - '0');
+
+        if (expMonth < 1 || expMonth > 12) {
+          printf("Invalid month. Must be 01 to 12.\n");
+          continue;
+        }
+
+        if (expYear < 25) {
+          printf("Card is expired.\n");
+          continue;
+        }
+        expvalid = 1;
       }
 
       do {
@@ -906,54 +937,53 @@ void payment(const char *referenceNumber, int fromReserve) {
       printf("Processing card payment...\n");
 
   } else {
+    strcpy(reservation.paymentMethod, "GCash");
 
-      strcpy(reservation.paymentMethod, "GCash");
+    char gcashNumber[15];
+    char gcashName[50];
 
-      char gcashNumber[15];
-      char gcashName[50];
+    printf("\n--- GCash Details ---\n");
 
-      printf("\n--- GCash Details ---\n");
+    do {
+      printf("GCash Number (11 digits): ");
+      scanf("%14s", gcashNumber);
+      while (getchar() != '\n');
 
-      do {
-        printf("GCash Number (11 digits): ");
-        scanf("%14s", gcashNumber);
-        while (getchar() != '\n');
+      int allDigits = 1;
+      for (int i = 0; i < (int)strlen(gcashNumber); i++) {
+        if (!isdigit(gcashNumber[i])) { allDigits = 0; break; }
+      }
 
-        int allDigits = 1;
-        for (int i = 0; i < (int)strlen(gcashNumber); i++) {
-          if (!isdigit(gcashNumber[i])) { allDigits = 0; break; }
-        }
-
-        if (!allDigits || strlen(gcashNumber) != 11)
-          printf("Invalid number. Must be exactly 11 digits.\n");
-        else
-          break;
-      } while (1);
-
-      do {
-        printf("GCash Account Name   : ");
-        fgets(gcashName, sizeof(gcashName), stdin);
-        gcashName[strcspn(gcashName, "\n")] = '\0';
-
-        int hasDigit = 0;
-        for (int i = 0; i < (int)strlen(gcashName); i++) {
-          if (isdigit(gcashName[i])) { hasDigit = 1; break; }
-        }
-
-        if (hasDigit) {
-          printf("Invalid name. Name must not contain numbers.\n");
-          continue;
-        }
-        if (strlen(gcashName) < 2) {
-          printf("Name too short. Please enter your full name.\n");
-          continue;
-        }
+      if (!allDigits || strlen(gcashNumber) != 11)
+        printf("Invalid number. Must be exactly 11 digits.\n");
+      else
         break;
-      } while (1);
+    } while (1);
 
-      reservation.amountReceived = reservation.finalAmount;
-      reservation.change         = 0;
-      printf("Processing GCash payment...\n");
+    do {
+      printf("GCash Account Name   : ");
+      fgets(gcashName, sizeof(gcashName), stdin);
+      gcashName[strcspn(gcashName, "\n")] = '\0';
+
+      int hasDigit = 0;
+      for (int i = 0; i < (int)strlen(gcashName); i++) {
+        if (isdigit(gcashName[i])) { hasDigit = 1; break; }
+      }
+
+      if (hasDigit) {
+        printf("Invalid name. Name must not contain numbers.\n");
+        continue;
+      }
+      if (strlen(gcashName) < 2) {
+        printf("Name too short. Please enter your full name.\n");
+        continue;
+      }
+      break;
+    } while (1);
+
+    reservation.amountReceived = reservation.finalAmount;
+    reservation.change         = 0;
+    printf("Processing GCash payment...\n");
   }
 
 
@@ -1245,20 +1275,21 @@ void registry() {
       printf("Check-In     : %s\n", res.checkIn);
       printf("Check-Out    : %s\n", res.checkOut);
 
-      do{
+      do {
         printf("\nAre you sure? [y/n]: ");
         scanf(" %c", &confirm);
         while (getchar() != '\n');
 
-        if(tolower(confirm) == 'n') 
-          printf("Cancellation aborted.\n");
-          return;
+        if (tolower(confirm) == 'y') break;
 
-        if(tolower(confirm) == 'y') break;
+        if (tolower(confirm) == 'n') {
+            printf("Cancellation aborted.\n");
+            return;
+        }
 
         printf("Y or N only.\n");
 
-      } while(tolower(confirm) != 'y');
+      } while (tolower(confirm) != 'y' && tolower(confirm) != 'n');
 
       FILE *bFile = fopen("bookings.txt", "r");
       if (!bFile) { printf("Could not open bookings.txt\n"); return; }
