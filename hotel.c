@@ -457,9 +457,8 @@ void reserve() {
       printf("Thank you for reserving. Enjoy your room.\n");
     
     if(payNow == 0) 
+      printf("Thank you for reserving! You can pay later.\n");
       return;
-    
-    printf("Thank you for reserving! You can pay later.\n");
 
   } while (tolower(payNow) != 'y' && tolower(payNow) != 'n' && payNow != '0');
 }
@@ -667,10 +666,10 @@ void payment(const char *referenceNumber, int fromReserve) {
 
         char filepath[60];
         switch (categoryPick) {
-          case 'A': strcpy(filepath, "Amenities/convenienceAmenite.txt"); break;
-          case 'B': strcpy(filepath, "Amenities/poolAmenite.txt");        break;
-          case 'C': strcpy(filepath, "Amenities/spaAmenite.txt");         break;
-          default:  printf("Invalid choice.\n"); continue;
+            case 'A': strcpy(filepath, "Amenities/convenienceAmenite.txt"); break;
+            case 'B': strcpy(filepath, "Amenities/poolAmenite.txt");        break;
+            case 'C': strcpy(filepath, "Amenities/spaAmenite.txt");         break;
+            default:  printf("Invalid choice.\n"); continue;
         }
 
         Amenity availableAmenities[10];
@@ -682,54 +681,64 @@ void payment(const char *referenceNumber, int fromReserve) {
         printf("\n%-6s | %-20s | %-16s | %s\n", "Code", "Name", "Price", "Type");
         printf("-------------------------------------------------------------------------------------------\n");
         for (int i = 0; i < availableCount; i++) {
-          printf("%-6s | %-20s | PHP %-12s | %-10s\n",
-            availableAmenities[i].code,
-            availableAmenities[i].name,
-            formatPrice(availableAmenities[i].price, priceBuffer),
-            availableAmenities[i].type);
+            printf("%-6s | %-20s | PHP %-12s | %-10s\n",
+                availableAmenities[i].code,
+                availableAmenities[i].name,
+                formatPrice(availableAmenities[i].price, priceBuffer),
+                availableAmenities[i].type);
         }
-
-        printf("\nEnter code to add (or 0 to skip): ");
-        char codePick[5];
-        scanf("%4s", codePick);
-        while (getchar() != '\n');
-
-        if (strcmp(codePick, "0") == 0) goto askMore;
 
         int foundIndex = -1;
-        for (int i = 0; i < availableCount; i++) {
-          if (strcasecmp(availableAmenities[i].code, codePick) == 0) {
-            foundIndex = i;
-            break;
+        while (1) {
+          printf("\nEnter code to add (or 0 to skip): ");
+          char codePick[5];
+          scanf("%4s", codePick);
+          while (getchar() != '\n');
+
+          if (strcmp(codePick, "0") == 0) break;
+
+          for (int i = 0; i < availableCount; i++) {
+            if (strcasecmp(availableAmenities[i].code, codePick) == 0) {
+              foundIndex = i;
+              break;
+            }
           }
+
+          if (foundIndex == -1) {
+            printf("Code not found. Please choose from the available codes:\n");
+            for (int i = 0; i < availableCount; i++)
+                printf("  [%s] %s\n", availableAmenities[i].code, availableAmenities[i].name);
+            continue;
+          }
+
+          break;
         }
-        if (foundIndex == -1) { printf("Code not found.\n"); goto askMore; }
 
-        float amenityCost = (strcmp(availableAmenities[foundIndex].type, "PerNight") == 0)
-            ? availableAmenities[foundIndex].price * (reservation.numberOfDays - 1)
-            : availableAmenities[foundIndex].price * reservation.numberOfGuests;
+        if (foundIndex != -1) {
+          float amenityCost = (strcmp(availableAmenities[foundIndex].type, "PerNight") == 0)
+              ? availableAmenities[foundIndex].price * (reservation.numberOfDays - 1)
+              : availableAmenities[foundIndex].price * reservation.numberOfGuests;
 
-        reservation.amenitiesTotal += amenityCost;
-        if (selectedCount < MAX_AMENITIES)
-            selectedAmenities[selectedCount++] = availableAmenities[foundIndex];
+          reservation.amenitiesTotal += amenityCost;
+          if (selectedCount < MAX_AMENITIES)
+              selectedAmenities[selectedCount++] = availableAmenities[foundIndex];
 
-        printf("Added: %s -- PHP ", availableAmenities[foundIndex].name);
-        printWithCommas(amenityCost);
-        printf("\n");
+          printf("Added: %s -- PHP ", availableAmenities[foundIndex].name);
+          printWithCommas(amenityCost);
+          printf("\n");
+        }
 
-        askMore:
-        do{
+        do {
           printf("\nAdd another amenity? [y/n]: ");
           scanf(" %c", &addMore);
           while (getchar() != '\n');
 
           addMore = tolower(addMore);
 
-          if(addMore != 'y' || addMore !='n'){
+          if (addMore != 'y' && addMore != 'n')
             printf("Y or N only.\n");
-          }
 
-        }while(addMore != 'y' && addMore !='n');
+        } while (addMore != 'y' && addMore != 'n');
       }
 
       if (selectedCount > 0) {

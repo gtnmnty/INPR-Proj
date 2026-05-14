@@ -21,3 +21,219 @@ Amount Received:
 Change:
 
 ===========================================================
+
+------- Guest Info -------
+Reference No: B0002
+Room #: 001
+Room Type: Classic
+Main Guest: jon snow
+No of Guest: 2
+Check-In: February 3, 2029
+Checkout: February 4, 2029
+No of Days: 1
+
+------- Bill Info -------
+Room Rate: 6500.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 6500.00
+
+------- Payment Info -------
+Status: Paid
+Method: Cash
+Amount Received: 7000.00
+Change: 500.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0003
+Room #: 005
+Room Type: Classic
+Main Guest: aegon ii
+No of Guest: 2
+Check-In: February 2, 2029
+Checkout: February 3, 2029
+No of Days: 1
+
+------- Bill Info -------
+Room Rate: 5000.00
+Amenities Used: P2
+Amenities Total: 1400.00
+Final Amount: 6400.00
+
+------- Payment Info -------
+Status: Paid
+Method: Cash
+Amount Received: 7000.00
+Change: 600.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0004
+Room #: 009
+Room Type: Classic
+Main Guest: duncan
+No of Guest: 2
+Check-In: March 2, 2029
+Checkout: March 4, 2029
+No of Days: 2
+
+------- Bill Info -------
+Room Rate: 13000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 13000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0005
+Room #: 004
+Room Type: Imperial Grand
+Main Guest: Daeny
+No of Guest: 12
+Check-In: June 1, 2028
+Checkout: June 12, 2028
+No of Days: 11
+
+------- Bill Info -------
+Room Rate: 495000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 495000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0006
+Room #: 013
+Room Type: Classic
+Main Guest: daeny
+No of Guest: 2
+Check-In: February 12, 2029
+Checkout: February 14, 2029
+No of Days: 2
+
+------- Bill Info -------
+Room Rate: 10000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 10000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0007
+Room #: 017
+Room Type: Classic
+Main Guest: autumn
+No of Guest: 1
+Check-In: March 2, 2029
+Checkout: March 4, 2029
+No of Days: 2
+
+------- Bill Info -------
+Room Rate: 10000.00
+Amenities Used: C1, C2
+Amenities Total: 2350.00
+Final Amount: 12350.00
+
+------- Payment Info -------
+Status: Paid
+Method: Cash
+Amount Received: 12500.00
+Change: 150.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0008
+Room #: 002
+Room Type: De Luxe
+Main Guest: dan
+No of Guest: 1
+Check-In: January 2, 2029
+Checkout: January 3, 2029
+No of Days: 1
+
+------- Bill Info -------
+Room Rate: 12500.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 12500.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0009
+Room #: 006
+Room Type: De Luxe
+Main Guest: egg
+No of Guest: 1
+Check-In: January 2, 2029
+Checkout: January 3, 2029
+No of Days: 1
+
+------- Bill Info -------
+Room Rate: 10000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 10000.00
+
+------- Payment Info -------
+Status: Not Paid
+Method:
+Amount Received:
+Change:
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0010
+Room #: 010
+Room Type: De Luxe
+Main Guest: eggg
+No of Guest: 1
+Check-In: January 2, 2029
+Checkout: January 3, 2029
+No of Days: 1
+
+------- Bill Info -------
+Room Rate: 12500.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 12500.00
+
+------- Payment Info -------
+Status: Paid
+Method: Cash
+Amount Received: 13000.00
+Change: 500.00
+
+===========================================================
