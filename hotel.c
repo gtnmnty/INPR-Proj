@@ -242,6 +242,7 @@ void reserve() {
   int currentDay = now->tm_mday;
 
   char rawInput[50];
+  int valid = 0;
 
   do {
     do {
@@ -263,9 +264,25 @@ void reserve() {
 
   numberOfDays = dateDifferenceInDays(checkIn, checkOut);
 
-  printf("Guest Name   : ");
-  fgets(guestName, sizeof(guestName), stdin);
-  guestName[strcspn(guestName, "\n")] = '\0';
+  do {
+    printf("Guest Name: ");
+    fgets(guestName, sizeof(guestName), stdin);
+    guestName[strcspn(guestName, "\n")] = '\0';
+    int valid = 1;
+
+    if (strlen(guestName) < 2) {
+        printf("Name too short.\n");
+        valid = 0;
+    } else {
+      for (int i = 0; i < strlen(guestName); i++) {
+        if (!isalpha(guestName[i]) && guestName[i] != ' ') {
+          printf("Name must contain letters only. No numbers or symbols.\n");
+          valid = 0;
+          break;
+        }
+      }
+    }
+  } while (!valid);
 
   do {
     printf("No. of Guests: ");
