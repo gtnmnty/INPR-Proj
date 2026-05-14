@@ -468,6 +468,7 @@ void bookingLookup() {
   FILE *file;
   char searchName[50];
   char line[200];
+  char anotherSearch;
 
   printf("\nBooking Inquiry\n");
   while (1) {
@@ -547,7 +548,7 @@ void bookingLookup() {
             searchLower[i] = tolower((unsigned char)searchName[i]);
         searchLower[i] = '\0';
 
-        if (strstr(storedLower, searchLower) != NULL) {
+        if (strcmp(storedLower, searchLower) == 0) {
           if (foundCount < MAX_BOOKINGS)
               found[foundCount++] = current;
         }
@@ -556,7 +557,7 @@ void bookingLookup() {
     fclose(file);
 
     if (foundCount == 0) {
-      printf("No bookings found for \"%s\".\n", searchName);
+      printf("\nNo bookings found for \"%s\".\n", searchName);
       printf("Try another name or enter 0 to cancel.\n");
       continue; 
     }
@@ -581,7 +582,18 @@ void bookingLookup() {
     }
 
     printf("Total booking(s) found: %d\n", foundCount);
-    return;
+    
+    do{
+      printf("\nSearch another guest? [y/n]: ");
+      scanf(" %c", &anotherSearch);
+      while (getchar() != '\n');
+
+      if(tolower(anotherSearch) == 'n') return;
+      if(tolower(anotherSearch) == 'y') break;
+
+      printf("Y or N only.\n");
+
+    } while(tolower(anotherSearch) != 'y' && tolower(anotherSearch) != 'n');
   }
 }
 
@@ -620,7 +632,6 @@ void payment(const char *referenceNumber, int fromReserve) {
   printf("Room Type            :  %s\n", reservation.roomType);
   printf("Price/night          :  PHP "); printWithCommas(reservation.pricePerNight); printf("\n");
   printf("Room Rate            :  PHP "); printWithCommas(reservation.roomRate);      printf("\n");
-
 
   if (fromReserve) {
       Amenity selectedAmenities[MAX_AMENITIES];
