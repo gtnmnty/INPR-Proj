@@ -124,7 +124,7 @@ int main() {
 
     choice = toupper(choice);
 
-    if(choice == 'H'){
+    if(choice == 'I'){
       exitSystem();
 
       printf("\nDo you want to go back to main menu? [y/n]: ");
