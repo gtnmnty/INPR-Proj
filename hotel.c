@@ -90,7 +90,7 @@ void printWithCommas(float amount);
 char *formatPrice(float amount, char *buffer);
 void receiptGenerator(Reservation *reservation, int methodPick);
 
-void inquiryRates();
+int inquiryRates();
 void inquiryAmenities();
 void inquiryRoomAvailability();
 char inqPickCategory(const char *prompt);
@@ -470,9 +470,9 @@ void bookingLookup() {
   char line[200];
   char anotherSearch;
 
-  printf("\nBooking Inquiry\n");
+  printf("\nBooking Inquiry");
   while (1) {
-    printf("Enter guest name (or 0 to cancel): ");
+    printf("\nEnter guest name (or 0 to cancel): ");
     fgets(searchName, sizeof(searchName), stdin);
     searchName[strcspn(searchName, "\n")] = '\0';
 
@@ -557,7 +557,7 @@ void bookingLookup() {
     fclose(file);
 
     if (foundCount == 0) {
-      printf("\nNo bookings found for \"%s\".\n", searchName);
+      printf("No bookings found for \"%s\".\n", searchName);
       printf("Try another name or enter 0 to cancel.\n");
       continue; 
     }
@@ -1089,6 +1089,7 @@ void registry() {
   char searchName[50];
   char searchAgain;
   char actionChoice;
+  char confirm;
 
   printf("\n----------- REGISTRY -----------\n");
   do {
@@ -1186,7 +1187,7 @@ void registry() {
         while (getchar() != '\n');
         actionChoice = toupper(actionChoice);
 
-        if (actionChoice == 'C' || actionChoice == 'M' || actionChoice == 'N') break;
+        if (actionChoice == 'C' || actionChoice == 'N') break;
         printf("Invalid choice. Please enter C, or N.\n");
       }
 
@@ -1235,15 +1236,20 @@ void registry() {
       printf("Check-In     : %s\n", res.checkIn);
       printf("Check-Out    : %s\n", res.checkOut);
 
-      printf("\nAre you sure? [y/n]: ");
-      char confirm;
-      scanf(" %c", &confirm);
-      while (getchar() != '\n');
+      do{
+        printf("\nAre you sure? [y/n]: ");
+        scanf(" %c", &confirm);
+        while (getchar() != '\n');
 
-      if (tolower(confirm) != 'y') {
-        printf("Cancellation aborted.\n");
-        goto search_again;
-      }
+        if(tolower(confirm) == 'n') 
+          printf("Cancellation aborted.\n");
+          return;
+
+        if(tolower(confirm) == 'y') break;
+
+        printf("Y or N only.\n");
+
+      } while(tolower(confirm) != 'y');
 
       FILE *bFile = fopen("bookings.txt", "r");
       if (!bFile) { printf("Could not open bookings.txt\n"); return; }
@@ -1310,10 +1316,20 @@ void registry() {
       printf("------------------------------------------\n");
     }
 
+    goto search_again;
+
     search_again:
-    printf("\nSearch another guest? [y/n]: ");
-    scanf(" %c", &searchAgain);
-    while (getchar() != '\n');
+    do{
+      printf("\nSearch another guest? [y/n]: ");
+      scanf(" %c", &searchAgain);
+      while (getchar() != '\n');
+
+      if(tolower(searchAgain) == 'n') return;
+      if(tolower(searchAgain) == 'y') break;
+
+      printf("Y or N only.\n");
+
+    } while(tolower(searchAgain) != 'y' && tolower(searchAgain) != 'y');
 
   } while (tolower(searchAgain) == 'y');
 
@@ -1421,20 +1437,16 @@ void inquiryMenu() {
     printf("  [3] - Room Availability\n");
     printf("  [0] - Exit\n");
     printf("========================================\n");
+    
     printf("Choice: ");
-
-    if (scanf("%d", &pick) == 0) {
-      while (getchar() != '\n')
-        ;
-      printf("Invalid input.\n");
-      pick = -1;
+    if (scanf("%d", &pick) != 1) {
+      while (getchar() != '\n');
       continue;
     }
-    while (getchar() != '\n');
 
     switch (pick) {
     case 1:
-      inquiryRates();
+      if (inquiryRates() == 0) pick = 0;
       break;
     case 2:
       inquiryAmenities();
@@ -1452,21 +1464,21 @@ void inquiryMenu() {
   } while (pick != 0);
 }
 
-void inquiryRates() {
+int inquiryRates() {
   Room rooms[MAX_ROOMS];
   int roomCount = readAllRooms(rooms);
 
   if (roomCount == 0) {
     printf("No room data found.\n");
-    return;
+    return 0;
   }
 
-  char again = 'y';
-  while (tolower(again) == 'y') {
+  char again;
 
+  while (1) {
     char categoryChoice = inqPickCategory("\nWhich room category are you interested in?");
     if (categoryChoice == '0')
-      return;
+      return 0;
 
     const char *chosenCategory;
     switch (categoryChoice) {
@@ -1495,7 +1507,6 @@ void inquiryRates() {
       printf("No rooms found under %s.\n", chosenCategory);
       goto ratesAskAgain;
     }
-
 
     int bedroomPick = 0;
     do {
@@ -1551,10 +1562,16 @@ void inquiryRates() {
       }
     }
 
-  ratesAskAgain:
-    printf("\nDo you have another inquiry? [y/n]: ");
-    scanf("%c", &again);
-    while (getchar() != '\n');
+    ratesAskAgain:
+    do{
+      printf("\nDo you have another inquiry? [y/n]: ");
+      scanf(" %c", &again);
+      while (getchar() != '\n');
+
+      if(tolower(again) == 'n') return 0;
+      if(tolower(again) == 'y') return 1;
+
+    } while(1); 
   }
 }
 
@@ -1562,7 +1579,6 @@ void inquiryAmenities() {
   char again = 'y';
 
   while (tolower(again) == 'y') {
-
 
     printf("\n--- AMENITY CATEGORY ---\n");
     printf("  [A] - Convenience\n");
