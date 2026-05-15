@@ -1108,7 +1108,7 @@ int validateAndFormatDate(const char *input, char *output, int currentYear, int 
     printf("Invalid day. %s %d has %d days.\n",
             monthNumberToName(month), year, maxDay);
     return 0;
-}
+  }
 
   if (dateSerial(month, day, year) < dateSerial(currentMonth, currentDay, currentYear)) {
     printf("Invalid date. Reservation date cannot be before today.\n");
