@@ -115,7 +115,7 @@ int main() {
     displayMenu();
 
     printf("Selection: ");
-    if (scanf("%c", &choice) == 0) {
+    if (scanf(" %c", &choice) == 0) {
       while (getchar() != '\n');
       printf("Invalid input. Please choose between the menu.\n");
       continue;
@@ -378,7 +378,7 @@ void reserve() {
         printf("Invalid room number. Please choose from the list above.\n");
   } while (selectedIndex == -1);
 
-  float roomRate = rooms[selectedIndex].pricePerNight * numberOfDays;
+  float roomRate = rooms[selectedIndex].pricePerNight * (numberOfDays + 1);
 
   char referenceNumber[10];
   generateReferenceNumber(referenceNumber);
@@ -702,10 +702,10 @@ void payment(const char *referenceNumber, int fromReserve) {
         if (availableCount == 0) { printf("No amenities found in file.\n"); continue; }
 
         char priceBuffer[20];
-        printf("\n%-6s | %-20s | %-16s | %s\n", "Code", "Name", "Price", "Type");
+        printf("\n%-6s | %-25s | %-16s | %s\n", "Code", "Name", "Price", "Type");
         printf("-------------------------------------------------------------------------------------------\n");
         for (int i = 0; i < availableCount; i++) {
-            printf("%-6s | %-20s | PHP %-12s | %-10s\n",
+            printf("%-6s | %-25s | PHP %-12s | %-10s\n",
                 availableAmenities[i].code,
                 availableAmenities[i].name,
                 formatPrice(availableAmenities[i].price, priceBuffer),
@@ -740,7 +740,7 @@ void payment(const char *referenceNumber, int fromReserve) {
 
         if (foundIndex != -1) {
           float amenityCost = (strcmp(availableAmenities[foundIndex].type, "PerNight") == 0)
-              ? availableAmenities[foundIndex].price * (reservation.numberOfDays - 1)
+              ? availableAmenities[foundIndex].price * (reservation.numberOfDays + 1)
               : availableAmenities[foundIndex].price * reservation.numberOfGuests;
 
           reservation.amenitiesTotal += amenityCost;
@@ -2094,7 +2094,7 @@ int findAmenityByCode(const char *code, Amenity *foundAmenity) {
 
 float calculateAmenitiesTotal(char codes[][5], int codeCount, int numberOfDays, int numberOfGuests) {
   float total = 0.0f;
-  int chargeableNights = numberOfDays > 0 ? numberOfDays - 1 : 0;
+  int chargeableNights = numberOfDays > 0 ? numberOfDays : 0;
 
   for (int c = 0; c < codeCount; c++) {
     Amenity amenity;
@@ -2244,8 +2244,6 @@ char *formatPrice(float amount, char *buffer) {
 
 void receiptGenerator(Reservation *reservation, int methodPick) {
   int receiptCount = 0;
-
-
 
   char testPath[50];
   for (int i = 1; i <= 9999; i++) {
