@@ -1524,7 +1524,7 @@ void inquiryMenu() {
       printf("Invalid choice.\n");
     }
 
-  } while (pick != 0);
+  } while (pick != 0 || !isdigit(pick));
 }
 
 int inquiryRates() {

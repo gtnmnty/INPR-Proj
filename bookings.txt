@@ -47,26 +47,3 @@ Change: 0.00
 
 ===========================================================
 
-------- Guest Info -------
-Reference No: B0003
-Room #: 005
-Room Type: Classic
-Main Guest: sdda
-No of Guest: 2
-Check-In: March 3, 3039
-Checkout: March 4, 3039
-No of Days: 1
-
-------- Bill Info -------
-Room Rate: 5000.00
-Amenities Used:
-Amenities Total: 0.00
-Final Amount: 5000.00
-
-------- Payment Info -------
-Status: Paid
-Method: Cash
-Amount Received: 5000.00
-Change: 0.00
-
-===========================================================

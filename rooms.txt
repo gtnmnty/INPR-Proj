@@ -26,7 +26,7 @@ Room #005:
 Category: Classic
 Bedrooms: 1
 Price: 5000.00
-Status: Occupied
+Status: Vacant
 
 Room #006:
 Category: De Luxe
