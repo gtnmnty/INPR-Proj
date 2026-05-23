@@ -91,7 +91,7 @@ char *formatPrice(float amount, char *buffer);
 void receiptGenerator(Reservation *reservation, int methodPick);
 
 int inquiryRates();
-void inquiryAmenities();
+int inquiryAmenities();
 void inquiryRoomAvailability();
 char inqPickCategory(const char *prompt);
 int  readAllRooms(Room *rooms);
@@ -1512,7 +1512,7 @@ void inquiryMenu() {
       if (inquiryRates() == 0) pick = 0;
       break;
     case 2:
-      inquiryAmenities();
+      if (inquiryAmenities() == 0) pick = 0;
       break;
     case 3:
       inquiryRoomAvailability();
@@ -1524,7 +1524,7 @@ void inquiryMenu() {
       printf("Invalid choice.\n");
     }
 
-  } while (pick != 0 || !isdigit(pick));
+  } while (pick != 0);
 }
 
 int inquiryRates() {
@@ -1635,11 +1635,13 @@ int inquiryRates() {
       if(tolower(again) == 'n') return 0;
       if(tolower(again) == 'y') return 1;
 
+      printf("Invalid Choice. Try again.\n");
+
     } while(1); 
   }
 }
 
-void inquiryAmenities() {
+int inquiryAmenities() {
   char again = 'y';
 
   while (tolower(again) == 'y') {
@@ -1656,7 +1658,7 @@ void inquiryAmenities() {
     catPick = toupper(catPick);
 
     if (catPick == '0')
-      return;
+      break;
 
     char filepath[60];
     char categoryName[20];
@@ -1683,7 +1685,7 @@ void inquiryAmenities() {
 
     if (amenityCount == 0){
       printf("No amenities found.\n");
-      goto amenitiesAskAgain;
+      continue;
     }
 
 
@@ -1698,11 +1700,19 @@ void inquiryAmenities() {
        amenities[i].type);
     }
 
-  amenitiesAskAgain:
-    printf("\nDo you have another inquiry? [y/n]: ");
-    scanf("%c", &again);
-    while (getchar() != '\n');
+    do {
+      printf("\nDo you have another inquiry? [y/n]: ");
+      scanf(" %c", &again);
+      while (getchar() != '\n');
+
+      if (tolower(again) != 'y' && tolower(again) != 'n')
+        printf("Invalid Choice. Try again.\n");
+
+    } while (tolower(again) != 'y' && tolower(again) != 'n');
+
+    if (tolower(again) == 'n') return 0;
   }
+  return 1;
 }
 
 void inquiryRoomAvailability(){
@@ -1716,8 +1726,6 @@ void inquiryRoomAvailability(){
 
   char again = 'y';
   while (tolower(again) == 'y'){
-
-
     char categoryChoice = inqPickCategory("\nWhich category do you want to check?");
     if (categoryChoice == '0')
       return;
@@ -1769,9 +1777,15 @@ void inquiryRoomAvailability(){
       }
     }
 
-    printf("\nDo you have another inquiry? [y/n]: ");
-    scanf(" %c", &again);
-    while (getchar() != '\n');
+    do {
+      printf("\nDo you have another inquiry? [y/n]: ");
+      scanf(" %c", &again);
+      while (getchar() != '\n');
+
+      if (tolower(again) != 'y' && tolower(again) != 'n')
+        printf("Invalid Choice. Try again.\n");
+
+    } while (tolower(again) != 'y' && tolower(again) != 'n');
   }
 }
 
