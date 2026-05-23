@@ -268,7 +268,7 @@ void reserve() {
     printf("Guest Name: ");
     fgets(guestName, sizeof(guestName), stdin);
     guestName[strcspn(guestName, "\n")] = '\0';
-    int valid = 1;
+    valid = 1;
 
     if (strlen(guestName) < 2) {
         printf("Name too short.\n");
@@ -402,7 +402,9 @@ void reserve() {
       return;
     }
 
-    printf("Invalid Choice. Please Choose between the options\n");
+    if(toupper(confirmReservation) != 'Y'){
+      printf("Invalid Choice. Please Choose between the options\n");
+    }
 
   } while(toupper(confirmReservation) != 'Y');
 
@@ -1252,37 +1254,41 @@ void registry() {
 
       if (actionChoice == 'N') return;
 
+      int isValid;
       if (actionChoice == 'C' || actionChoice == 'c') {
-        printf("\nEnter reference number to cancel [0 to skip]: ");
-        scanf("%9s", targetRef);
-        while (getchar() != '\n');
+        do {
+          printf("\nEnter reference number to cancel [0 to skip]: ");
+          scanf("%9s", targetRef);
+          while (getchar() != '\n');
 
-        if (strcmp(targetRef, "0") == 0)
-          goto search_again;
+          if (strcmp(targetRef, "0") == 0)
+            goto search_again;
 
-        int isValid = 1;
-        int len = strlen(targetRef);
+          isValid = 1;
+          int len = strlen(targetRef);
 
-        if (len < 2) {
-          isValid = 0;
-        } else {
-          for (int i = 0; targetRef[i] != '\0'; i++) {
-            if (!isalnum((unsigned char)targetRef[i])) {
-              isValid = 0;
-              break;
+          if (len < 2) {
+            isValid = 0;
+          } else {
+            for (int i = 0; targetRef[i] != '\0'; i++) {
+              if (!isalnum((unsigned char)targetRef[i])) {
+                isValid = 0;
+                break;
+              }
             }
           }
-        }
 
-        if (!isValid) {
-          printf("[ERROR] Please enter a valid reference (e.g. B0005).\n");
-          continue;
-        }
+          if (!isValid) {
+            printf("[ERROR] Please enter a valid reference (e.g. B0005).\n");
+            continue;
+          }
 
-        if (!findBooking(targetRef, &res)) {
-          printf("[ERROR] Reference number %s not found.\n", targetRef);
-          continue;
-        }
+          if (!findBooking(targetRef, &res)) {
+            printf("[ERROR] Reference number %s not found.\n", targetRef);
+            isValid = 0;
+          }
+
+        } while (!isValid);
       }
 
       printf("\n--- CANCELLING RESERVATION ---\n");
@@ -1583,7 +1589,7 @@ int inquiryRates() {
     } while (bedroomPick < 1 || bedroomPick > maxBedrooms);
 
 
-    printf("\n------ ROOM RATES: %s, %d bedroom(s) ------\n", chosenCategory, bedroomPick);
+    printf("\n--------- ROOM RATES: %s, %d bedroom(s) ---------\n", chosenCategory, bedroomPick);
 
     int found = 0;
     for (int i = 0; i < roomCount; i++) {
@@ -1593,6 +1599,7 @@ int inquiryRates() {
                rooms[i].roomNumber, rooms[i].bedrooms);
         printWithCommas(rooms[i].pricePerNight);
         printf("/night | %s\n", rooms[i].isAvailable ? "Vacant" : "Occupied");
+        printf("-----------------------------------------------------");
         found = 1;
       }
     }
@@ -1644,7 +1651,7 @@ void inquiryAmenities() {
     printf("  [0] - Back\n");
     printf("Choice: ");
     char catPick;
-    scanf("%c", &catPick);
+    scanf(" %c", &catPick);
     while (getchar() != '\n');
     catPick = toupper(catPick);
 
@@ -1763,7 +1770,7 @@ void inquiryRoomAvailability(){
     }
 
     printf("\nDo you have another inquiry? [y/n]: ");
-    scanf("%c", &again);
+    scanf(" %c", &again);
     while (getchar() != '\n');
   }
 }
@@ -2285,7 +2292,7 @@ char inqPickCategory(const char *prompt){
   printf("  [D] - Imperial Grand\n");
   printf("  [0] - Back\n");
   printf("Choice: ");
-  scanf("%c", &pick);
+  scanf(" %c", &pick);
   while (getchar() != '\n');
   return toupper(pick);
 }

@@ -25,24 +25,48 @@ Change:
 
 ------- Guest Info -------
 Reference No: B0002
+Room #: 013
+Room Type: Classic
+Main Guest: jon
+No of Guest: 2
+Check-In: March 2, 2029
+Checkout: March 5, 2029
+No of Days: 3
+
+------- Bill Info -------
+Room Rate: 15000.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 15000.00
+
+------- Payment Info -------
+Status: Paid
+Method: Cash
+Amount Received: 15000.00
+Change: 0.00
+
+===========================================================
+
+------- Guest Info -------
+Reference No: B0003
 Room #: 005
 Room Type: Classic
-Main Guest: jon 1
-No of Guest: 1
-Check-In: March 2, 2029
-Checkout: March 3, 2029
+Main Guest: sdda
+No of Guest: 2
+Check-In: March 3, 3039
+Checkout: March 4, 3039
 No of Days: 1
 
 ------- Bill Info -------
 Room Rate: 5000.00
-Amenities Used: C1
-Amenities Total: 850.00
-Final Amount: 5850.00
+Amenities Used:
+Amenities Total: 0.00
+Final Amount: 5000.00
 
 ------- Payment Info -------
 Status: Paid
-Method: Card
-Amount Received: 5850.00
+Method: Cash
+Amount Received: 5000.00
 Change: 0.00
 
 ===========================================================

@@ -74,7 +74,7 @@ Room #013:
 Category: Classic
 Bedrooms: 1
 Price: 5000.00
-Status: Vacant
+Status: Occupied
 
 Room #014:
 Category: De Luxe
